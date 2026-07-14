@@ -1,16 +1,23 @@
 import { useState, useEffect } from "react";
-import { Box, Button, Paper, AppBar, Toolbar, Typography, TextField, InputAdornment } from "@mui/material";
+import { Tabs, Tab, Box, Button, Paper, AppBar, Toolbar, Typography, TextField, InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
 function Checker ({onLogout}) {
     const[requests, setRequests]=useState([]);
     const [searchTerm, setSearchTerm] = useState("");
+    const [activeTab, setActiveTab] = useState(0);
     useEffect(() => {
         const stored=JSON.parse(localStorage.getItem("requests")) || []
         setRequests(stored);
      }, []);
+     function handleTabChange (event, newVal) {
+        setActiveTab(newVal);
+     }
      function approveRequest (index) {
         const updated= [...requests];
+        if (updated[index].status==="Rejected") {
+            return;
+        }
         updated[index].status="Approved";
         setRequests(updated);
         localStorage.setItem("requests", JSON.stringify(updated));
@@ -25,6 +32,9 @@ function Checker ({onLogout}) {
         return requests
         .map((request, index) => ({request, index}))
         .filter(({request}) => request.status  === statusFilter)
+        .filter(({ request }) =>
+            request.employee.toLowerCase().includes(searchTerm.toLowerCase())
+        )
         .map(({request, index}) => (
             <Paper key={index} sx={{ padding:2, marginBottom:2}}>
                 <Typography>Employee: {request.employee}</Typography>
@@ -51,16 +61,17 @@ function Checker ({onLogout}) {
      return (
         <Box sx={{ padding : 3 }}>
             <AppBar position="static" sx={{backgroundColor: "#711F7E"}}>
-            <Toolbar sx={{ display: "flex", justifyContent: "space-between"}}>
+            <Toolbar sx={{ display: "flex", alignItems: "center"}}>
             
-            <Typography variant="h6">Checker Dashboard</Typography>
-                <TextField size="small" placeholder="Search Requests..." 
+            <Typography variant="h6" sx={{flexGrow: 1}}>Checker Dashboard</Typography>
+            <Box sx={{display: "flex", alignItems: "center", gap:2}}>
+                <TextField size="small" placeholder="Search Requests..."  
                 value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
                 InputProps={{
                     startAdornment: ( 
                     <InputAdornment position="start">
-                        <SearchIcon sx={{color: "white"}}>
-                        </SearchIcon>
+                       <SearchIcon sx={{color: "white"}}>
+                       </SearchIcon> 
                         </InputAdornment>
 
 
@@ -76,26 +87,23 @@ function Checker ({onLogout}) {
             <Button onClick={onLogout} variant="outlined" sx={{ color: "white", borderColor: "white" }}>
                     Logout
                 </Button>
+                </Box>
             </Toolbar>
           </AppBar>  
-            <Box sx={{ display: "flex", gap: 3, marginTop: 3 }}>
-                <Box sx={{ flex: 1 }}>
-                    <Typography variant="h6" gutterBottom>Pending</Typography>
-                    {renderColumn("Pending")}
-                </Box>
-            
-            <Box sx= {{flex: 1}}>
-                <Typography variant="h6" gutterBottom>Approved</Typography>
-                {renderColumn("Approved")}
-                
-            </Box>
-
-            <Box sx= {{flex: 1}}>
-                <Typography variant="h6" gutterBottom>Rejected</Typography>
-                {renderColumn("Rejected")}
-            </Box>                        
+            <Tabs value={activeTab} onChange={handleTabChange} sx={{marginTop: 3}}>     
+                <Tab label="Pending"></Tab>  
+                <Tab label="Approved"></Tab>   
+                <Tab label="Rejected"></Tab>        
+            </Tabs> 
+            <Box sx={{ marginTop: 2 }}>
+        {activeTab === 0 && renderColumn("Pending")}
+        {activeTab === 1 && renderColumn("Approved")}
+        {activeTab === 2 && renderColumn("Rejected")}
+            </Box>     
+       
        </Box>
-    </Box>
+     
+    
     );
 }
 export default Checker;

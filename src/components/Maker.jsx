@@ -25,6 +25,7 @@ console.log("Request Saved: ", request);
 setEmployee(" ");
 setDays(" ");
 setReason(" ");
+alert("Request submitted");
 }
 
 return (
