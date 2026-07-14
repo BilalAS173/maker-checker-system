@@ -12,7 +12,12 @@ function ProjectSelect({user, onSelectProject}) {
             }}
         > 
             <Typography variant="h4"> Welcome, {user.name}</Typography>
-            <Typography variant="body1" color="text.secondary"> Select a Project to continue, {user.name}</Typography>
+            {user.projects.length===0 ? (
+                <Typography variant="body1" color="text.secondary">You have no assigned projects. Please contact your administrator.
+                </Typography>
+            ) : (
+                <>
+                 <Typography variant="body1" color="text.secondary"> Select a Project to continue, {user.name}</Typography>
             {user.projects.map((project) => (
                 <Button
                 key={project.project_id}
@@ -25,6 +30,10 @@ function ProjectSelect({user, onSelectProject}) {
                 </Button>
             )
             )}
+                </>
+            )
+         }
+           
 
         </Box>
     );

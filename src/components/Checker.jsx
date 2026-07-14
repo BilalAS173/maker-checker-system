@@ -43,6 +43,7 @@ function Checker ({onLogout}) {
                 <Box sx={{marginTop: 1}}>
                     <Button variant="contained" color={request.status === "Approved" ? "success" : "inherit"}
                     onClick={() => approveRequest(index)}
+                    disabled={request.status === "Rejected"}
                     >
                         Approve 
                     </Button>
@@ -73,8 +74,6 @@ function Checker ({onLogout}) {
                        <SearchIcon sx={{color: "white"}}>
                        </SearchIcon> 
                         </InputAdornment>
-
-
                 ),
               }}
                 sx={{ 

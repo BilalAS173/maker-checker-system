@@ -5,7 +5,7 @@ const users = [
     {
         employee_id: "C001",
         password: "checker123",
-        name: "Bilal",
+        name: "David",
         projects: [
             { project_id: "P1", project_name: "XYZ", role: "maker" },
             { project_id: "P2", project_name: "ABC", role: "checker" },
@@ -18,6 +18,12 @@ const users = [
         projects: [
             { project_id: "P3", project_name: "Vacation Requests", role: "maker" },
         ],
+    },
+    {
+        employee_id: "M002",
+        password: "maker124",
+        name: "Steve",
+        projects: [],
     },
 ];
 
