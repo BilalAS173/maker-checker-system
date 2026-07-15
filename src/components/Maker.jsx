@@ -7,7 +7,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew"
 
 function Maker ({onLogout, project, user }) {
-const [employee, setEmployee]= useState(" ");
 const [days, setDays]=useState(" ");
 const [reason, setReason]=useState(" ");
 const [view, setView]=useState("list")
@@ -50,24 +49,8 @@ alert("Request submitted");
 
 const filteredRequests= requests.filter((r) => r.reason.toLowerCase().includes(searchTerm.toLowerCase()) 
 );
-// sx={{ minHeight: "100vh", backgroundColor:"#121212"}}
 return (
-    <Box >
-    <Box
-        sx={{
-            width: "100% ",
-            margin: "0 auto",
-            backgroundColor: "#711F7E",
-            color: "white",
-            display: "flex",
-            justifyContent: "space-between",
-            padding: 2,
-            marginTop: 2,
-            borderRadius: 1,
-            alignItems: "center",
-            padding: "12px 40px"
-        }}
-    >
+    <>
         <TextField
             size="small"
             placeholder="Search Requests"
@@ -76,29 +59,18 @@ return (
             InputProps={{
                 startAdornment: (
                     <InputAdornment position="start">
-                        <SearchIcon sx={{color: "white"}}>  </SearchIcon>
+                        <SearchIcon />
                     </InputAdornment>
                 ),
              }}
              sx={{
-                backgroundColor: "rgba(255,255,255, 0.15)",
-                borderRadius: 1,
-                input: { color: "white"},
-                width: 220,
+                marginBottom: 2,
+                width: 300
              }}
         />
 
-        <Box sx={{display: "flex", alignItems: "center", gap: 1}}>
-        <Typography>{user.name}</Typography>
-        <IconButton onClick={onLogout} sx={{ color: "white"}}>
-            <PowerSettingsNewIcon />
-        </IconButton>
-    </Box>
- </Box>
-    
-    <Box sx={{width: "80%", margin: "20px auto"}}>
         {view === "list" && (
-            <>
+          <>
             <Button variant="contained"
             sx={{marginBottom: 2}}
             onClick={() => setView("form")}
@@ -166,11 +138,10 @@ return (
             </form>
             </Box>
     )}
-    </Box>
-     </Box>
+</>
     
 );
-
 }
+
 
 export default Maker;

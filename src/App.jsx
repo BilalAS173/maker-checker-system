@@ -31,11 +31,15 @@ function App() {
             )}
 
             {selectedProject !== null && selectedProject.role === "maker" && (
+              <Layout user={user} onLogout={handleLogout}>
                 <Maker onLogout={handleLogout} project={selectedProject} user={user} />
+                </Layout>
             )}
 
             {selectedProject !== null && selectedProject.role === "checker" && (
+              <Layout user={user} onLogout={handleLogout}>
                 <Checker onLogout={handleLogout} project={selectedProject} user={user} />
+                </Layout>
             )}
         </div>
     
