@@ -14,7 +14,7 @@ const users = [
     {
         employee_id: "M001",
         password: "maker123",
-        name: "Ali",
+        name: "Smith",
         projects: [
             { project_id: "P3", project_name: "Vacation Requests", role: "maker" },
         ],

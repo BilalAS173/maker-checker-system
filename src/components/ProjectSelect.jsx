@@ -25,7 +25,7 @@ function ProjectSelect({user, onSelectProject}) {
              sx={{minwidth: 250}}
                 onClick={() => onSelectProject(project)}
                 >
-                    {project.project_name} ({project.role})
+                    {project.project_name} 
 
                 </Button>
             )

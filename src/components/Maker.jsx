@@ -50,10 +50,10 @@ const filteredRequests= requests.filter((r) => r.reason.toLowerCase().includes(s
 );
 return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2, marginBottom: 2 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2, marginBottom: 2, color: "white"}}>
             <TextField
                 size="small"
-                placeholder="Search Requests"
+                placeholder="Search Requests..."
                 value={searchTerm}
                 onChange={(e) => setsearchTerm(e.target.value)}
                 InputProps={{
@@ -63,7 +63,7 @@ return (
                         </InputAdornment>
                     ),
                 }}
-                sx={{ width: 300 }}
+                sx={{ width: 300 , color: "white"}}
             />
 
             {view === "list" && (
