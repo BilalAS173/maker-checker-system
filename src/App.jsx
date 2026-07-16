@@ -6,44 +6,73 @@ import Login from './components/Login'
 import Checker from "./components/Checker";
 import ProjectSelect from './components/ProjectSelect';
 import Layout from './components/layout'
+import {Routes, Route, Navigate, useNavigate} from 'react-router-dom'
 
 function App() {
-  const [user, setUser] = useState(null)
-  const [selectedProject, setSelectedProject]=useState(null)
+  const [user, setUser] = useState(null);
+  const [selectedProject, setSelectedProject]=useState(null);
+  const navigate=useNavigate();
 
   function handleLogin(matchedUser) {
     setUser(matchedUser);
+    navigate("/projects");
   }
   function handleProjectSelect(project) {
     setSelectedProject(project);
+    if (project.role === "maker" ) {
+      navigate("/maker");
+    }
+    else {
+       navigate("/checker");
+    }
     }
   
   function handleLogout() {
         setUser(null);
         setSelectedProject(null);
+        navigate("/login");
     }
 
   return (
-      <div>
-            {user === null && <Login onLogin={handleLogin} />}
+      <Routes>
+         <Route path="/login" element={<Login onLogin={handleLogin}></Login>}>
+         </Route>
 
-            {user !== null && selectedProject === null && (
-                <ProjectSelect user={user} onSelectProject={handleProjectSelect} />
-            )}
+         <Route path="/projects"
+         element={
+          user ? ( <ProjectSelect user={user} onSelectProject={handleProjectSelect}></ProjectSelect>) 
+          : (
+            <Navigate to="/login" />
+          )
+         }
+         >
 
-            {selectedProject !== null && selectedProject.role === "maker" && (
-              <Layout user={user} onLogout={handleLogout}>
-                <Maker onLogout={handleLogout} project={selectedProject} user={user} />
-                </Layout>
-            )}
+         </Route>
+         <Route path="/maker" element={
+          user && selectedProject ? (
+            <Layout user={user} onLogout={handleLogout}>
+            <Maker project={selectedProject} user={user}></Maker>
+            </Layout>
+          ) : (
+            <Navigate to="/login"></Navigate>
+          )
+         }
+      />
+         <Route path="/checker"
+         element={
+          user && selectedProject ? (
+            <Layout user={user} onLogout={handleLogout}>
+              <Checker user={user} project={selectedProject}></Checker>
+            </Layout>
+          ) : (
+            <Navigate to="/login" />
+          )
+         }
+         />
 
-            {selectedProject !== null && selectedProject.role === "checker" && (
-              <Layout user={user} onLogout={handleLogout}>
-                <Checker onLogout={handleLogout} project={selectedProject} user={user} />
-                </Layout>
-            )}
-        </div>
-    
+       
+      </Routes>
+      
   );
 }
 
