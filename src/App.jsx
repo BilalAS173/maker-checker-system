@@ -35,7 +35,7 @@ function App() {
 
   return (
       <Routes>
-         <Route path="/login" element={<Login onLogin={handleLogin}></Login>}>
+         <Route path="/login" element={<Login onLogin={handleLogin} />}>
          </Route>
 
          <Route path="/projects"
@@ -46,11 +46,10 @@ function App() {
           )
          }
          >
-
          </Route>
          <Route path="/maker" element={
           user && selectedProject ? (
-            <Layout user={user} onLogout={handleLogout}>
+            <Layout user={user} onLogout={handleLogout} title={"View Requests"}>
             <Maker project={selectedProject} user={user}></Maker>
             </Layout>
           ) : (
@@ -69,11 +68,11 @@ function App() {
           )
          }
          />
-
+<Route path="*" element={<Navigate to="/login" />} />
        
       </Routes>
       
   );
 }
 
-export default App
+export default App;
