@@ -5,6 +5,7 @@ import './App.css'
 import Login from './components/Login'
 import Checker from "./components/Checker";
 import ProjectSelect from './components/ProjectSelect';
+import Layout from './components/layout'
 
 function App() {
   const [user, setUser] = useState(null)

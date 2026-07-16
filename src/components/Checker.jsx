@@ -33,7 +33,8 @@ function Checker ({onLogout}) {
         .map((request, index) => ({request, index}))
         .filter(({request}) => request.status  === statusFilter)
         .filter(({ request }) =>
-            request.employee.toLowerCase().includes(searchTerm.toLowerCase())
+            request.employee.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            request.reason.toLowerCase().includes(searchTerm.toLowerCase())
         )
         .map(({request, index}) => (
             <Paper key={index} sx={{ padding:2, marginBottom:2}}>
@@ -61,11 +62,8 @@ function Checker ({onLogout}) {
      }
      return (
         <Box sx={{ padding : 3 }}>
-            <AppBar position="static" sx={{backgroundColor: "#711F7E"}}>
-            <Toolbar sx={{ display: "flex", alignItems: "center"}}>
-            
-            <Typography variant="h6" sx={{flexGrow: 1}}>Checker Dashboard</Typography>
-            <Box sx={{display: "flex", alignItems: "center", gap:2}}>
+            <Box sx={{display: "flex", alignItems:"center", justifyContent: "space-between", marginBottom: 2}}>
+            <Typography variant="h5" sx={{flexGrow: 1}}>Checker Dashboard</Typography>
                 <TextField size="small" placeholder="Search Requests..."  
                 value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
                 InputProps={{
@@ -83,12 +81,10 @@ function Checker ({onLogout}) {
                     width: 250,
                 }}
             />
-            <Button onClick={onLogout} variant="outlined" sx={{ color: "white", borderColor: "white" }}>
-                    Logout
-                </Button>
-                </Box>
-            </Toolbar>
-          </AppBar>  
+           
+            </Box>
+       
+          
             <Tabs value={activeTab} onChange={handleTabChange} sx={{marginTop: 3}}>     
                 <Tab label="Pending"></Tab>  
                 <Tab label="Approved"></Tab>   

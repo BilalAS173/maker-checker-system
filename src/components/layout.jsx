@@ -6,7 +6,7 @@ import {
 import { purple } from '@mui/material/colors';
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew"
 
-function layout ({children, user, onLogout}) {
+function Layout ({children, user, onLogout}) {
 return (
 <Box sx={{display: "flex" , minHeight: "100vh"}}>
     {/* //it should contain side bar and a box containing nav bar and content*/}
@@ -14,10 +14,14 @@ return (
         sx={{
             width: "20%",
             backgroundColor: "white",
-            borderRight: "1px solid #e0e0e0"
+            borderRight: "1px solid #e0e0e0",
+            color: "black",
+            padding: 6,
             }}
           >  
+          <Typography variant="h6">Employee Portal</Typography>
        {/* side bar content goes here*/}
+
     </Box>
     <Box
          sx={{width: "80%", 
@@ -32,7 +36,8 @@ return (
                     display: "flex",
                     padding: "12px 40px",
                     boxSizing: "border-box",
-                    justifyContent: "flex-end"
+                    justifyContent: "flex-end",
+                    alignItems: "center"
         }}>
             <Typography>{user.name}</Typography>
             <IconButton onClick={onLogout} sx={{color: "white"}}>

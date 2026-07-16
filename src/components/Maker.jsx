@@ -39,7 +39,6 @@ let requests=JSON.parse(localStorage.getItem("requests")) || [];
 requests.push(request);
 localStorage.setItem("requests", JSON.stringify(requests));
 console.log("Request Saved: ", request);
-setEmployee(" ");
 setDays(" ");
 setReason(" ");
 loadMyRequests();
@@ -50,98 +49,91 @@ alert("Request submitted");
 const filteredRequests= requests.filter((r) => r.reason.toLowerCase().includes(searchTerm.toLowerCase()) 
 );
 return (
-    <>
-        <TextField
-            size="small"
-            placeholder="Search Requests"
-            value={searchTerm}
-            onChange={(e) => setsearchTerm(e.target.value)}
-            InputProps={{
-                startAdornment: (
-                    <InputAdornment position="start">
-                        <SearchIcon />
-                    </InputAdornment>
-                ),
-             }}
-             sx={{
-                marginBottom: 2,
-                width: 300
-             }}
-        />
+    <Box sx={{ display: "flex", flexDirection: "column" }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2, marginBottom: 2 }}>
+            <TextField
+                size="small"
+                placeholder="Search Requests"
+                value={searchTerm}
+                onChange={(e) => setsearchTerm(e.target.value)}
+                InputProps={{
+                    startAdornment: (
+                        <InputAdornment position="start">
+                            <SearchIcon />
+                        </InputAdornment>
+                    ),
+                }}
+                sx={{ width: 300 }}
+            />
+
+            {view === "list" && (
+                <Button variant="contained" onClick={() => setView("form")}>
+                    Add Request
+                </Button>
+            )}
+        </Box>
 
         {view === "list" && (
-          <>
-            <Button variant="contained"
-            sx={{marginBottom: 2}}
-            onClick={() => setView("form")}
-            >
-                Add Request
-            </Button>
-                <TableContainer component={Paper}>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell> Request Number</TableCell>
-                                <TableCell> Name</TableCell>
-                                <TableCell> Days</TableCell>
-                                <TableCell> Reason</TableCell>
-
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Request Number</TableCell>
+                            <TableCell>Name</TableCell>
+                            <TableCell>Days</TableCell>
+                            <TableCell>Reason</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {filteredRequests.map((r, i) => (
+                            <TableRow key={r.request_id}>
+                                <TableCell>{i + 1}</TableCell>
+                                <TableCell>{r.employee}</TableCell>
+                                <TableCell>{r.days}</TableCell>
+                                <TableCell>{r.reason}</TableCell>
                             </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {filteredRequests.map((r,i) => (
-                                <TableRow key={r.request_id}>
-                                    <TableCell>{i+1}</TableCell>
-                                    <TableCell>{r.employee}</TableCell>
-                                    <TableCell> {r.days}</TableCell>
-                                    <TableCell>{r.reason} </TableCell>
-                                </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        )}
 
-                            )
-                            
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </>
-        )
-        }
-    {view=="form" && (
-        <Box sx={{maxWidth: 500}}>
-            <Typography variant="h5" sx={{marginBottom: 2}}>
-                Add request
-            </Typography>
-            <form onSubmit={handleSubmit}>
-                <Box sx={{display: "flex", flexDirection: "column", gap: 2}}>
-                      <TextField
+        {view === "form" && (
+            <Box sx={{ maxWidth: 500 }}>
+                <Typography variant="h5" sx={{ marginBottom: 2 }}>
+                    Add request
+                </Typography>
+                <form onSubmit={handleSubmit}>
+                    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                        <TextField
                             label="Number of Days"
                             type="number"
                             value={days}
-                            onChange={(e) =>setDays(e.target.value)}
+                            onChange={(e) => setDays(e.target.value)}
                             required
                             fullWidth
-                        />      
-                            <TextField
+                        />
+                        <TextField
                             label="Reason"
                             value={reason}
-
                             onChange={(e) => setReason(e.target.value)}
-                            required       
+                            required
                             fullWidth
                             multiline
                             rows={3}
-                            />
-                        <Button type="submit" variant="contained">Submit Request</Button>
-                        <Button variant="contained" onClick={() => setView("list")}>Back</Button>
-                </Box>
-
-            </form>
+                        />
+                        <Button type="submit" variant="contained">
+                            Submit Request
+                        </Button>
+                        <Button variant="contained" onClick={() => setView("list")}>
+                            Back
+                        </Button>
+                    </Box>
+                </form>
             </Box>
-    )}
-</>
-    
+        )}
+    </Box>
 );
 }
-
 
 export default Maker;
