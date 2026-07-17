@@ -42,22 +42,26 @@ function Layout({ children, user, onLogout, title }) {
             display: "flex",
             padding: "12px 40px",
             boxSizing: "border-box",
-            justifyContent: "space-between",
             alignItems: "center",
           }}
         >
-          <div>
-            <div>
-              <Typography>{title}</Typography>
-            </div>
-            <div>
-              <Typography>{user.name}</Typography>
-              <IconButton onClick={onLogout} sx={{ color: "white" }}>
-                <PowerSettingsNewIcon />
-              </IconButton>
-            </div>
-          </div>
-          {/* Nav bar content goes here*/}
+          <Box sx={{flex: 1}} />
+          <Box sx={{flex: 1, textAlign: "center"}}>
+            <Typography variant="h6">{title}</Typography>
+          </Box>
+          <Box sx={{
+            flex:1,
+            display: "flex",
+            justifyContent:"flex-end",
+            alignItems:"center",
+            gap: 1
+          }}>
+            <Typography>{user.name}</Typography>
+            <IconButton onClick={onLogout} sx={{color: "white"}} >
+              <PowerSettingsNewIcon />
+            </IconButton>
+
+          </Box>
         </Box>
 
         <Box sx={{ flex: 1, padding: 3 }}>{children}</Box>

@@ -60,7 +60,7 @@ function App() {
          <Route path="/checker"
          element={
           user && selectedProject ? (
-            <Layout user={user} onLogout={handleLogout}>
+            <Layout user={user} onLogout={handleLogout} title={"Approval Queue"}>
               <Checker user={user} project={selectedProject}></Checker>
             </Layout>
           ) : (
