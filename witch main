@@ -1,5 +1,0 @@
-[33m6b69110[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32madd-routes[m[33m, [m[1;31morigin/add-routes[m[33m)[m restructure: separate frontend and backend into subfolders
-[33mff320e8[m Improved the UI: the navigation bar and the checker page
-[33m9ab2dea[m Work on Routes setup
-[33m48145a2[m Added Routes setup
-[33mc2f8250[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m Made some slight changes
