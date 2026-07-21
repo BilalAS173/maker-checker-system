@@ -19,34 +19,51 @@ useEffect( () => {
 );
 
 function loadMyRequests () {
-    const stored=JSON.parse(localStorage.getItem("requests")) || [];
-    const mine= stored.filter((r) => r.employee === user.name);
-    setRequests(mine);
+    fetch( `http://localhost:5000/requests/${project.project_id}`)
+    .then((res)=> (res.json()))
+    .then((data) => {
+        const mine= data.filter((r) => r.employee_name === user.name);
+        setRequests(mine); 
+    })
+    .catch((err) => console.error(err));
 }
 
+function handleSubmit (e) {
+    e.preventDefault();
 
-function handleSubmit(e) {
-e.preventDefault ();
-const request = {
-    request_id: Date.now(),
-employee : user.name,
-days,
-reason,
-status: "Pending",
-};
+    fetch("http://localhost:5000/requests", {
+        method: "POST",
+        headers: {"Content-Type" : "application/json" },
+        body: JSON.stringify( {
+            user_id:user.user_id,
+            project_id:project.project_id,
+            days,
+            description: reason
+        } )
 
-let requests=JSON.parse(localStorage.getItem("requests")) || [];
-requests.push(request);
-localStorage.setItem("requests", JSON.stringify(requests));
-console.log("Request Saved: ", request);
-setDays(" ");
-setReason(" ");
-loadMyRequests();
-setView("list");
-alert("Request submitted");
-}
+    })
+    .then((res) => res.json())
+    .then((data) => {
+        if (data.success) {
+            setDays(" ");
+            setReason(" ");
+            loadMyRequests( );
+            setView("list");
+            alert("Request submited");
+        }
+            else {
+                alert("Something went wrong when submitting the request");
+            }
 
-const filteredRequests= requests.filter((r) => r.reason.toLowerCase().includes(searchTerm.toLowerCase()) 
+            
+        } )
+        .catch((err)  => {
+            console.error(err);
+            alert("Could not connect to server");
+        });
+    }
+    
+const filteredRequests= requests.filter((r) => r.description.toLowerCase().includes(searchTerm.toLowerCase()) 
 );
 return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
@@ -90,7 +107,7 @@ return (
                                 <TableCell>{i + 1}</TableCell>
                                 <TableCell>{r.employee}</TableCell>
                                 <TableCell>{r.days}</TableCell>
-                                <TableCell>{r.reason}</TableCell>
+                                <TableCell>{r.description}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -134,6 +151,7 @@ return (
         )}
     </Box>
 );
+
 }
 
 export default Maker;

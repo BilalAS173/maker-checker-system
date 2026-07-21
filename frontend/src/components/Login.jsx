@@ -1,49 +1,33 @@
 import { useState } from "react";
 import { Box, Typography, Select, TextField, MenuItem, Button, FormControl, InputLabel } from "@mui/material";
 
-const users = [
-    {
-        employee_id: "C001",
-        password: "checker123",
-        name: "David",
-        projects: [
-            { project_id: "P1", project_name: "XYZ", role: "maker" },
-            { project_id: "P2", project_name: "ABC", role: "checker" },
-        ],
-    },
-    {
-        employee_id: "M001",
-        password: "maker123",
-        name: "Smith",
-        projects: [
-            { project_id: "P3", project_name: "Vacation Requests", role: "maker" },
-        ],
-    },
-    {
-        employee_id: "M002",
-        password: "maker124",
-        name: "Steve",
-        projects: [],
-    },
-];
-
 function Login ({onLogin}) {
    const [employeeId, setEmployeeId] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     
 function handleClick() {
-    const matchedUser= users.find((user) => user.employee_id === employeeId && user.password===password);
-
-    if (matchedUser) {
-        setError ("")
-        onLogin(matchedUser)
-
+fetch("http://localhost:5000/login" , {
+    method: "POST",
+    headers: { "Content-Type" : "application/json"},
+    body:   JSON.stringify({employeeId: employeeId, password}),
+})
+    .then((res) => res.json())
+    .then((data) => {
+        if (data.error) {
+            setError(data.error);
+        }
+        else {
+            setError("");
+            onLogin(data);
+        }
+    })
+    .catch((err) => { 
+        console.error(err);
+        setError("Could not connect to server");
     }
-    else {
-        setError("Invalid Employee ID or password");
+        );
     }
-}
     return (
     <Box
             sx={{

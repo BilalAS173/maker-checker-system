@@ -12,7 +12,7 @@ app.use(express.json());
 app.get("/requests/:projectId", (req, res) => {
     const { projectId }=req.params;
     const query= `
-    Select r.request_id, r.description, r.status,
+    Select r.request_id, r.description, r.status, r.days
     r.created_date, u.name AS employee_name
     FROM requests r
     JOIN users u ON r.user_id=u.user_id
@@ -69,9 +69,9 @@ app.post("/login", (req, res)=> {
 
 //Post a request for Maker
 app.post ("/requests", (req, res) => {
-const {user_id, project_id, description}=req.body;
-const query= "INSERT INTO requests (user_id, project_id, description) VALUES (?,?,?)";
-db.query(query, [user_id, project_id, description], (err, result) => {
+const {user_id, project_id, days, description}=req.body;
+const query= "INSERT INTO requests (user_id, project_id, days, description) VALUES (?,?,?,?)";
+db.query(query, [user_id, project_id, days, description], (err, result) => {
 if(err) {
     console.error(err);
     return res.status(500).json({error: "Database Error"});
