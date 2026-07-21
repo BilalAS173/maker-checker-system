@@ -5,42 +5,61 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
-function Checker ({onLogout}) {
+function Checker ({project}) {
     const[requests, setRequests]=useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [activeTab, setActiveTab] = useState(0);
     useEffect(() => {
-        const stored=JSON.parse(localStorage.getItem("requests")) || []
-        setRequests(stored);
+        loadRequests();
      }, []);
+
+     function loadRequests () {
+        fetch( `http://localhost:5000/requests/${project.project_id}`)
+        .then((res)  => res.json())
+        .then ((data) => setRequests(data) )
+        .catch((err) => console.error(err));
+     }
      function handleTabChange (event, newVal) {
         setActiveTab(newVal);
      }
-     function approveRequest (index) {
-        const updated= [...requests];
-        if (updated[index].status==="Rejected") {
+
+     function approveRequest (request_id, currentStatus) {
+        if (currentStatus==="Rejected") {
             return;
         }
-        updated[index].status="Approved";
-        setRequests(updated);
-        localStorage.setItem("requests", JSON.stringify(updated));
+        updateStatus(request_id, "Approved");
      }
-       function rejectRequest (index) {
-        const updated= [...requests];
-        if (updated[index].status==="Approved") {
+       function rejectRequest (request_id, currentStatus) {
+        if (currentStatus==="Approved") {
             return;
         }
-        updated[index].status="Rejected";
-        setRequests(updated);
-        localStorage.setItem("requests", JSON.stringify(updated));
+        updateStatus(request_id, "Rejected");
      }
+
+     function updateStatus (request_id, newStatus) {
+        fetch( `http://localhost:5000/requests/${request_id}`, {
+            method: "PATCH",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({status: newStatus}),
+
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.success) {
+                    loadRequests();
+                } else {
+                    alert("Something went wrong while updating the request");
+                }
+            })
+            .catch((err) => console.error(err));
+     }
+
      function renderColumn(statusFilter) {
         const filtered=requests
-        .map((request, index) => ({request, index}))
-        .filter(({request}) => request.status  === statusFilter)
-        .filter(({ request }) =>
-            request.employee.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            request.reason.toLowerCase().includes(searchTerm.toLowerCase())
+        .filter((request) => request.status  === statusFilter)
+        .filter((request ) =>
+            request.employee_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            request.description.toLowerCase().includes(searchTerm.toLowerCase())
         );
         return (
             <TableContainer component={Paper}>
@@ -54,15 +73,15 @@ function Checker ({onLogout}) {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filtered.map(({request, index}) => (
-                            <TableRow key={index} >
-                                <TableCell>{request.employee}</TableCell>
+                        {filtered.map((request) => (
+                            <TableRow key={request.request_id} >
+                                <TableCell>{request.employee_name}</TableCell>
                                 <TableCell>{request.days}</TableCell>
-                                <TableCell>{request.reason}</TableCell>
+                                <TableCell>{request.description}</TableCell>
                                 <TableCell>
                                     <Button variant="contained"
                                     color={request.status=== "Approved" ? "success" : "inherit"}
-                                    onClick={()=> approveRequest(index)}
+                                    onClick={()=> approveRequest(request.request_id, request.status)}
                                     disabled={request.status === "Rejected"}
                                     sx={{marginRight: 1}}
                                     >
@@ -70,7 +89,7 @@ function Checker ({onLogout}) {
                                     </Button>
                                     <Button variant="contained"
                                     color={request.status==="Rejected" ? "error" : "inherit"}
-                                    onClick={()=> rejectRequest(index)}
+                                    onClick={()=> rejectRequest(request.request_id, request.status)}
                                     disabled={request.status==="Approved"}
                                     sx={{marginLeft: 1}}
                                     >

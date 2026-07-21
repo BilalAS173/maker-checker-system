@@ -62,7 +62,7 @@ function handleSubmit (e) {
             alert("Could not connect to server");
         });
     }
-    
+
 const filteredRequests= requests.filter((r) => r.description.toLowerCase().includes(searchTerm.toLowerCase()) 
 );
 return (
@@ -105,7 +105,7 @@ return (
                         {filteredRequests.map((r, i) => (
                             <TableRow key={r.request_id}>
                                 <TableCell>{i + 1}</TableCell>
-                                <TableCell>{r.employee}</TableCell>
+                                <TableCell>{r.employee_name}</TableCell>
                                 <TableCell>{r.days}</TableCell>
                                 <TableCell>{r.description}</TableCell>
                             </TableRow>

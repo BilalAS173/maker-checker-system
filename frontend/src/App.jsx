@@ -61,7 +61,7 @@ function App() {
          element={
           user && selectedProject ? (
             <Layout user={user} onLogout={handleLogout} title={"Approval Queue"}>
-              <Checker user={user} project={selectedProject}></Checker>
+              <Checker project={selectedProject} user={user} ></Checker>
             </Layout>
           ) : (
             <Navigate to="/login" />

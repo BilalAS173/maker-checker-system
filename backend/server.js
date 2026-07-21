@@ -12,7 +12,7 @@ app.use(express.json());
 app.get("/requests/:projectId", (req, res) => {
     const { projectId }=req.params;
     const query= `
-    Select r.request_id, r.description, r.status, r.days
+    Select r.request_id, r.description, r.status, r.days,
     r.created_date, u.name AS employee_name
     FROM requests r
     JOIN users u ON r.user_id=u.user_id
@@ -32,10 +32,13 @@ db.query(query, [projectId], (err, results) => {
 
 //for login
 app.post("/login", (req, res)=> {
-    const{ employee_id, password}=req.body;
+    const{ employee_id, password}=req?.body;
+    console.log("user details ", employee_id, password)
+
     const userQuery= "SELECT * FROM users WHERE employee_id = ? AND password = ?";
     db.query(userQuery, [employee_id, password], (err, userResults) =>
     {
+        console.log("userResults", userResults)
         if (err) {
             console.error(err);
             return res.status(500).json({ error: "Database Error"});
