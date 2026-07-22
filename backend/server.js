@@ -20,6 +20,7 @@ app.get("/requests/:projectId", (req, res) => {
     ORDER BY r.created_date DESC
     `;
 
+
 db.query(query, [projectId], (err, results) => {
  if (err) {
     console.error(err);
