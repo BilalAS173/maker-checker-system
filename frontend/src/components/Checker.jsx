@@ -22,7 +22,7 @@ function Checker ({project}) {
      function handleTabChange (event, newVal) {
         setActiveTab(newVal);
      }
-
+     
      function approveRequest (request_id, currentStatus) {
         if (currentStatus==="Rejected") {
             return;
