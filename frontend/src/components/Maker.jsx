@@ -1,3 +1,4 @@
+import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import {
     Box, Typography, TextField, Button, InputAdornment, IconButton,
@@ -6,7 +7,10 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew"
 
-function Maker ({onLogout, project, user }) {
+function Maker ( ) {
+const user= useSelector((state) => state.user);
+const project= useSelector((project) => state.project);
+
 const [days, setDays]=useState(" ");
 const [reason, setReason]=useState(" ");
 const [view, setView]=useState("list")

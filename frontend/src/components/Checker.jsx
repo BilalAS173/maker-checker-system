@@ -1,3 +1,4 @@
+import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import { Tabs, Tab, Box, Button, Paper, AppBar, Toolbar, Typography, TextField, InputAdornment } from "@mui/material";
 import {
@@ -5,7 +6,9 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
-function Checker ({project}) {
+function Checker () {
+    const project= useSelector((project) => state.project);
+    
     const[requests, setRequests]=useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [activeTab, setActiveTab] = useState(0);

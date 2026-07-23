@@ -1,4 +1,5 @@
 import { useState } from "react";
+import {useSelector} from 'react-redux';
 import {
   Box,
   Typography,
@@ -17,7 +18,8 @@ import {
 import { purple } from "@mui/material/colors";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
 
-function Layout({ children, user, onLogout, title }) {
+function Layout({ children, onLogout, title }) {
+  const user=useSelector((state) => state.user);
   return (
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
       {/* //it should contain side bar and a box containing nav bar and content*/}

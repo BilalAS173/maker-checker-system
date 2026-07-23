@@ -1,4 +1,7 @@
-import { useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux';
+//import { useState } from 'react';
+import { login, logout } from './store/userSlice';
+import { selectProject, clearProject } from './store/projectSlice';
 import { Button } from "@mui/material";
 import Maker from "./components/Maker";
 import './App.css'
@@ -9,16 +12,18 @@ import Layout from './components/layout'
 import {Routes, Route, Navigate, useNavigate} from 'react-router-dom'
 
 function App() {
-  const [user, setUser] = useState(null);
-  const [selectedProject, setSelectedProject]=useState(null);
-  const navigate=useNavigate();
+  const user= useSelector((state) => user.state);
+  const dispatch= useDispatch();
+
+  const selectProject=useSelector((state) => project.state);
+  const navigate= useNavigate();
 
   function handleLogin(matchedUser) {
-    setUser(matchedUser);
+    dispatch(login(matchedUser));
     navigate("/projects");
   }
   function handleProjectSelect(project) {
-    setSelectedProject(project);
+    dispatch(selectProject(project));
     if (project.role === "maker" ) {
       navigate("/maker");
     }
@@ -28,9 +33,9 @@ function App() {
     }
   
   function handleLogout() {
-        setUser(null);
-        setSelectedProject(null);
-        navigate("/login");
+    dispatch(logout());
+    dispatch(clearProject());
+    navigate("/login");
     }
 
   return (
@@ -40,7 +45,7 @@ function App() {
 
          <Route path="/projects"
          element={
-          user ? ( <ProjectSelect user={user} onSelectProject={handleProjectSelect}></ProjectSelect>) 
+          user ? ( <ProjectSelect onSelectProject={handleProjectSelect}></ProjectSelect>) 
           : (
             <Navigate to="/login" />
           )
@@ -49,8 +54,8 @@ function App() {
          </Route>
          <Route path="/maker" element={
           user && selectedProject ? (
-            <Layout user={user} onLogout={handleLogout} title={"View Requests"}>
-            <Maker project={selectedProject} user={user}></Maker>
+            <Layout onLogout={handleLogout} title={"View Requests"}>
+            <Maker />
             </Layout>
           ) : (
             <Navigate to="/login"></Navigate>
@@ -60,8 +65,8 @@ function App() {
          <Route path="/checker"
          element={
           user && selectedProject ? (
-            <Layout user={user} onLogout={handleLogout} title={"Approval Queue"}>
-              <Checker project={selectedProject} user={user} ></Checker>
+            <Layout onLogout={handleLogout} title={"Approval Queue"}>
+              <Checker />
             </Layout>
           ) : (
             <Navigate to="/login" />
