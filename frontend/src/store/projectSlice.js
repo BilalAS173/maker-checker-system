@@ -2,7 +2,7 @@ import {createSlice} from "@reduxjs/toolkit";
 const projectSlice= createSlice({
     name: "project",
     initialState: null,
-    renders:  {
+    reducers:  {
         selectProject(state, action) {
             return action.payload;
         },

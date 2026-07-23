@@ -7,8 +7,8 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 
 function Checker () {
-    const project= useSelector((project) => state.project);
-    
+    const project= useSelector((state) => state.project);
+
     const[requests, setRequests]=useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [activeTab, setActiveTab] = useState(0);

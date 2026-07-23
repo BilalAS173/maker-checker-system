@@ -2,14 +2,14 @@ import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import {
     Box, Typography, TextField, Button, InputAdornment, IconButton,
-    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Chip
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew"
 
 function Maker ( ) {
 const user= useSelector((state) => state.user);
-const project= useSelector((project) => state.project);
+const project= useSelector((state) => state.project);
 
 const [days, setDays]=useState(" ");
 const [reason, setReason]=useState(" ");
@@ -103,6 +103,7 @@ return (
                             <TableCell>Name</TableCell>
                             <TableCell>Days</TableCell>
                             <TableCell>Reason</TableCell>
+                            <TableCell>Status</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -112,6 +113,14 @@ return (
                                 <TableCell>{r.employee_name}</TableCell>
                                 <TableCell>{r.days}</TableCell>
                                 <TableCell>{r.description}</TableCell>
+                                <TableCell>
+                                    <Chip label={r.status}
+                                        color={r.status === "Approved" ? "success" : r.status=="Rejected"
+                                            ? "error" : "default"
+                                        }
+                                    >
+                                    </Chip>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

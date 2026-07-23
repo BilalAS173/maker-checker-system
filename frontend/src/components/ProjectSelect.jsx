@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import {Box, Typography, Button, textFieldClasses} from "@mui/material"
 function ProjectSelect({onSelectProject}) {
-    const user= userSelector((state) => state.user);
+    const user= useSelector((state) => state.user);
     return (
         <Box  
          sx={{

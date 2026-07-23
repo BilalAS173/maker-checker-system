@@ -1,5 +1,4 @@
 import { useSelector, useDispatch } from 'react-redux';
-//import { useState } from 'react';
 import { login, logout } from './store/userSlice';
 import { selectProject, clearProject } from './store/projectSlice';
 import { Button } from "@mui/material";
@@ -12,10 +11,10 @@ import Layout from './components/layout'
 import {Routes, Route, Navigate, useNavigate} from 'react-router-dom'
 
 function App() {
-  const user= useSelector((state) => user.state);
+  const user= useSelector((state) => state.user);
   const dispatch= useDispatch();
 
-  const selectProject=useSelector((state) => project.state);
+  const selectedProject=useSelector((state) => state.project);
   const navigate= useNavigate();
 
   function handleLogin(matchedUser) {
