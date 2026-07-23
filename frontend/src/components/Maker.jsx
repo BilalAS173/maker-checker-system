@@ -8,14 +8,16 @@ import SearchIcon from "@mui/icons-material/Search";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew"
 
 function Maker ( ) {
+    
 const user= useSelector((state) => state.user);
 const project= useSelector((state) => state.project);
 
-const [days, setDays]=useState(" ");
-const [reason, setReason]=useState(" ");
+const [days, setDays]=useState("");
+const [reason, setReason]=useState("");
 const [view, setView]=useState("list")
-const [searchTerm, setsearchTerm]=useState(" ")
+const [searchTerm, setsearchTerm]=useState("")
 const [requests, setRequests]=useState([])
+const [searchInput, setsearchInput]= useState("");
 
 useEffect( () => {
     loadMyRequests();
@@ -67,6 +69,20 @@ function handleSubmit (e) {
         });
     }
 
+    function isValidSearchTerm (value) {
+        const allowedPattern= /^[a-zA-Z0-9 ][a-zA-Z0-9 ']*[a-zA-Z0-9 ]$|^[a-zA-Z0-9 ]?$/;
+        return allowedPattern.test(value);
+    }
+
+    function handleSearchSubmit () {
+        if (isValidSearchTerm(searchInput)) {
+            setsearchTerm(searchInput);
+        }
+        else {
+            alert("Search term contains invalid characters.");
+        }
+    }
+
 const filteredRequests= requests.filter((r) => r.description.toLowerCase().includes(searchTerm.toLowerCase()) 
 );
 return (
@@ -75,17 +91,28 @@ return (
             <TextField
                 size="small"
                 placeholder="Search Requests..."
-                value={searchTerm}
-                onChange={(e) => setsearchTerm(e.target.value)}
-                InputProps={{
+                value={searchInput}
+                onChange={(e) => setsearchInput(e.target.value)}
+                onKeyDown= {(e) => {
+                    if (e.key==="Enter") {
+                        handleSearchSubmit();
+                    }
+                }}
+                
+              /*  InputProps={{
                     startAdornment: (
                         <InputAdornment position="start">
                             <SearchIcon />
                         </InputAdornment>
                     ),
                 }}
-                sx={{ width: 300 , color: "white"}}
+                sx={{ width: 300 , color: "white"}}*/
+
             />
+            <IconButton onClick={handleSearchSubmit}>
+            <SearchIcon />
+             </IconButton>
+            
 
             {view === "list" && (
                 <Button variant="contained" onClick={() => setView("form")}>
