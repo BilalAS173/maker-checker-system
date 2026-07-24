@@ -27,8 +27,8 @@ useEffect( () => {
 function loadMyRequests () {
     fetch( `http://localhost:5000/requests/${project.project_id}`)
     .then((res)=> (res.json()))
-    .then((data) => {
-        const mine= data.filter((r) => r.employee_name === user.name);
+    .then((response) => {
+        const mine= (response.data).filter((r) => r.employee_name === user.name);
         setRequests(mine); 
     })
     .catch((err) => console.error(err));

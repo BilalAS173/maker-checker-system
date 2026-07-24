@@ -11,24 +11,51 @@ app.use(express.json());
 //get all requests for a project
 app.get("/requests/:projectId", (req, res) => {
     const { projectId }=req.params;
-    const query= `
+    const { page=1, limit=10, search= ""}=req.query;
+    const offset= (page-1)*limit;
+    const searchPattern= `%${search}%`
+    const dataQuery= `
     Select r.request_id, r.description, r.status, r.days,
     r.created_date, u.name AS employee_name
     FROM requests r
     JOIN users u ON r.user_id=u.user_id
     WHERE r.project_id=?
+    AND (u.name LIKE ? OR r.description LIKE ?)
     ORDER BY r.created_date DESC
+    LIMIT ? OFFSET ?
     `;
 
+    const countQuery= `
+    SELECT COUNT(*) AS total
+    FROM requests r
+    JOIN users u ON r.user_id=u.user_id
+    WHERE r.project_id= ?
+    AND (u.name LIKE ? OR r.description LIKE ?)
+    `;
 
-db.query(query, [projectId], (err, results) => {
+db.query(countQuery, [projectId, searchPattern, searchPattern], (err, countResults) => {
  if (err) {
     console.error(err);
     return res.status(500).json({error: "Database error"});
+ }
+    const totalCount= countResults[0].total;
+    const totalPages= Math.ceil(totalCount/limit);
 
- }  
- res.json(results); 
+    db.query(dataQuery , [projectId, searchPattern, searchPattern, Number(limit), Number(offset)], (err, 
+        dataResults) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({error: "Database error"});
+            }
+        
+        res.json ({
+            data: dataResults,
+            totalCount, 
+            page: Number(page),
+            totalPages,
+        });
     });
+  });
 });
 
 //for login
@@ -61,12 +88,12 @@ app.post("/login", (req, res)=> {
             console.error(err);
             return res.status(500).json({ error: "Database Error"});
         }
-        res.json({
-            user_id:user.user_id,
-        employee_id:user.employee_id,
-        name:user.name,
-        projects: projectResults,
-            });
+   res.json({
+    user_id: user.user_id,
+    employee_id: user.employee_id,
+    name: user.name,
+    projects: projectResults,
+});
         });
     });
 });

@@ -20,7 +20,7 @@ function Checker () {
      function loadRequests () {
         fetch( `http://localhost:5000/requests/${project.project_id}`)
         .then((res)  => res.json())
-        .then ((data) => setRequests(data) )
+        .then ((response) => setRequests(response.data) )
         .catch((err) => console.error(err));
      }
      function handleTabChange (event, newVal) {
