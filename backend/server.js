@@ -11,7 +11,7 @@ app.use(express.json());
 //get all requests for a project
 app.get("/requests/:projectId", (req, res) => {
     const { projectId }=req.params;
-    const { page=1, limit=10, search= ""}=req.query;
+    const { page=1, limit=10, search= "", status=""}=req.query;
     const offset= (page-1)*limit;
     const searchPattern= `%${search}%`
     const dataQuery= `
@@ -30,10 +30,11 @@ app.get("/requests/:projectId", (req, res) => {
     FROM requests r
     JOIN users u ON r.user_id=u.user_id
     WHERE r.project_id= ?
+    AND r.status=?
     AND (u.name LIKE ? OR r.description LIKE ?)
     `;
 
-db.query(countQuery, [projectId, searchPattern, searchPattern], (err, countResults) => {
+db.query(countQuery, [projectId, status,searchPattern, searchPattern], (err, countResults) => {
  if (err) {
     console.error(err);
     return res.status(500).json({error: "Database error"});
@@ -41,7 +42,7 @@ db.query(countQuery, [projectId, searchPattern, searchPattern], (err, countResul
     const totalCount= countResults[0].total;
     const totalPages= Math.ceil(totalCount/limit);
 
-    db.query(dataQuery , [projectId, searchPattern, searchPattern, Number(limit), Number(offset)], (err, 
+    db.query(dataQuery , [projectId, status, searchPattern, searchPattern, Number(limit), Number(offset)], (err, 
         dataResults) => {
             if (err) {
                 console.error(err);

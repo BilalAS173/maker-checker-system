@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import { Tabs, Tab, Box, Button, Paper, AppBar, Toolbar, Typography, TextField, InputAdornment, IconButton } from "@mui/material";
 import {
-    Table, TableBody, TableCell, TableContainer, TableHead, TableRow
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Pagination
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
@@ -13,14 +13,19 @@ function Checker () {
     const [searchTerm, setSearchTerm] = useState("");
     const [activeTab, setActiveTab] = useState(0);
     const [searchInput, setSearchInput]= useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     useEffect(() => {
         loadRequests();
-     }, []);
+     }, [currentPage, searchTerm]);
 
      function loadRequests () {
-        fetch( `http://localhost:5000/requests/${project.project_id}`)
+        fetch( `http://localhost:5000/requests/${project.project_id}?page=${currentPage}&limit=10&search=${searchTerm}`)
         .then((res)  => res.json())
-        .then ((response) => setRequests(response.data) )
+        .then ((response) => {
+            setRequests(response.data);
+            setTotalPages(response.totalPages);
+        } )
         .catch((err) => console.error(err));
      }
      function handleTabChange (event, newVal) {
