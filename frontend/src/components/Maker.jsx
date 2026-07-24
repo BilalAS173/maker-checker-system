@@ -92,7 +92,14 @@ return (
                 size="small"
                 placeholder="Search Requests..."
                 value={searchInput}
-                onChange={(e) => setsearchInput(e.target.value)}
+                onChange={(e) => {
+                    const value= e.target.value;
+                    setsearchInput(value);
+                if (value=== "") {
+                    setsearchTerm("");
+                }
+            }
+               } 
                 onKeyDown= {(e) => {
                     if (e.key==="Enter") {
                         handleSearchSubmit();

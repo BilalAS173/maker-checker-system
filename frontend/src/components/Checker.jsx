@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
-import { Tabs, Tab, Box, Button, Paper, AppBar, Toolbar, Typography, TextField, InputAdornment } from "@mui/material";
+import { Tabs, Tab, Box, Button, Paper, AppBar, Toolbar, Typography, TextField, InputAdornment, IconButton } from "@mui/material";
 import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow
 } from "@mui/material";
@@ -12,6 +12,7 @@ function Checker () {
     const[requests, setRequests]=useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [activeTab, setActiveTab] = useState(0);
+    const [searchInput, setSearchInput]= useState("");
     useEffect(() => {
         loadRequests();
      }, []);
@@ -38,6 +39,19 @@ function Checker () {
         }
         updateStatus(request_id, "Rejected");
      }
+     function isValidSearchTerm (value) {
+        const allowedPattern= /^[a-zA-Z0-9 ][a-zA-Z0-9 ']*[a-zA-Z0-9 ]$|^[a-zA-Z0-9 ]?$/;
+        return allowedPattern.test(value);
+    }
+
+    function handleSearchSubmit () {
+        if (isValidSearchTerm(searchInput)) {
+            setSearchTerm(searchInput);
+        }
+        else {
+            alert("Search term contains invalid characters.");
+        }
+    }
 
      function updateStatus (request_id, newStatus) {
         fetch( `http://localhost:5000/requests/${request_id}`, {
@@ -116,17 +130,32 @@ function Checker () {
                 <TextField
                     size="small"
                     placeholder="Search Requests..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    InputProps={{
+                    value={searchInput}
+                    onChange={(e) => {
+                        const value=e.target.value;
+                        setSearchInput(value);
+                        if (value==="") {
+                            setSearchTerm("");
+                        }
+                        }
+                    }
+                     onKeyDown={(e) => {
+                            if (e.key==="Enter") {
+                                handleSearchSubmit();
+                            }
+                        }}
+                   /* InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
                                 <SearchIcon />
                             </InputAdornment>
                         ),
-                    }}
+                    }}*/
                     sx={{ width: 250 }}
                 />
+                <IconButton onClick={handleSearchSubmit}>
+                    <SearchIcon />
+                </IconButton>
            
             </Box>
        
