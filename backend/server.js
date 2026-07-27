@@ -13,13 +13,15 @@ app.get("/requests/:projectId", (req, res) => {
     const { projectId }=req.params;
     const { page=1, limit=10, search= "", status=""}=req.query;
     const offset= (page-1)*limit;
-    const searchPattern= `%${search}%`
+    const searchPattern= `%${search}%`;
+    const statusPattern= status === "" ? "%" : status;
     const dataQuery= `
     Select r.request_id, r.description, r.status, r.days,
     r.created_date, u.name AS employee_name
     FROM requests r
     JOIN users u ON r.user_id=u.user_id
     WHERE r.project_id=?
+    AND r.status LIKE ?
     AND (u.name LIKE ? OR r.description LIKE ?)
     ORDER BY r.created_date DESC
     LIMIT ? OFFSET ?
@@ -30,11 +32,11 @@ app.get("/requests/:projectId", (req, res) => {
     FROM requests r
     JOIN users u ON r.user_id=u.user_id
     WHERE r.project_id= ?
-    AND r.status=?
+    AND r.status LIKE ?
     AND (u.name LIKE ? OR r.description LIKE ?)
     `;
 
-db.query(countQuery, [projectId, status,searchPattern, searchPattern], (err, countResults) => {
+db.query(countQuery, [projectId, statusPattern,searchPattern, searchPattern], (err, countResults) => {
  if (err) {
     console.error(err);
     return res.status(500).json({error: "Database error"});
@@ -42,7 +44,7 @@ db.query(countQuery, [projectId, status,searchPattern, searchPattern], (err, cou
     const totalCount= countResults[0].total;
     const totalPages= Math.ceil(totalCount/limit);
 
-    db.query(dataQuery , [projectId, status, searchPattern, searchPattern, Number(limit), Number(offset)], (err, 
+    db.query(dataQuery , [projectId, statusPattern, searchPattern, searchPattern, Number(limit), Number(offset)], (err, 
         dataResults) => {
             if (err) {
                 console.error(err);

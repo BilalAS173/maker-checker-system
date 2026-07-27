@@ -9,22 +9,42 @@ import SearchIcon from "@mui/icons-material/Search";
 function Checker () {
     const project= useSelector((state) => state.project);
 
-    const[requests, setRequests]=useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [activeTab, setActiveTab] = useState(0);
     const [searchInput, setSearchInput]= useState("");
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-    useEffect(() => {
-        loadRequests();
-     }, [currentPage, searchTerm]);
+    //const [currentPage, setCurrentPage] = useState(1);
+    //const [totalPages, setTotalPages] = useState(1);
 
-     function loadRequests () {
-        fetch( `http://localhost:5000/requests/${project.project_id}?page=${currentPage}&limit=10&search=${searchTerm}`)
+    const[ pendingRequests, setPendingRequests]= useState([]);
+    const [pendingPage, setPendingPage]= useState(1);
+    const [pendingTotalPages, setPendingTotalPages]= useState(1);
+
+    const [approvedRequests, setApprovedRequests]= useState([]);
+    const [approvedPage, setApprovedPage]= useState(1);
+    const [approvedTotalPages, setApprovedTotalPages]= useState(1);
+
+    const [rejectedRequests, setRejectedRequests]= useState([]);
+    const [rejectedPage, setRejectedPage]= useState(1);
+    const [rejectedTotalPages, setRejectedTotalPages]= useState(1);
+
+    useEffect(() => {
+        loadRequestsByStatus("Pending", pendingPage, setPendingRequests, setPendingTotalPages);
+     }, [pendingPage, searchTerm]);
+
+    useEffect (() => {
+        loadRequestsByStatus("Approved", approvedPage, setApprovedRequests, setApprovedTotalPages);
+    }, [approvedPage, searchTerm]);
+
+    useEffect (() => {
+        loadRequestsByStatus("Rejected", rejectedPage, setRejectedRequests, setRejectedTotalPages);
+    }, [rejectedPage, searchTerm]);
+
+     function loadRequestsByStatus (status, page, setDataFn, setTotalPagesFn) {
+        fetch( `http://localhost:5000/requests/${project.project_id}?page=${page}&limit=5&search=${searchTerm}&status=${status}`)
         .then((res)  => res.json())
         .then ((response) => {
-            setRequests(response.data);
-            setTotalPages(response.totalPages);
+            setDataFn(response.data);
+            setTotalPagesFn(response.totalPages);
         } )
         .catch((err) => console.error(err));
      }
@@ -68,7 +88,14 @@ function Checker () {
             .then((res) => res.json())
             .then((data) => {
                 if (data.success) {
-                    loadRequests();
+                    loadRequestsByStatus("Pending", pendingPage, setPendingRequests, setPendingTotalPages);
+
+                    if (newStatus==="Approved"){
+                        loadRequestsByStatus("Approved", approvedPage, setApprovedRequests, setApprovedTotalPages);
+                    }
+                    else if (newStatus=="Rejected") {
+                        loadRequestsByStatus("Rejected", rejectedPage, setRejectedRequests, setRejectedTotalPages);
+                    }
                 } else {
                     alert("Something went wrong while updating the request");
                 }
@@ -76,14 +103,15 @@ function Checker () {
             .catch((err) => console.error(err));
      }
 
-     function renderColumn(statusFilter) {
-        const filtered=requests
-        .filter((request) => request.status  === statusFilter)
-        .filter((request ) =>
-            request.employee_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            request.description.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+     function renderColumn(requestList, currentPage, totalPages, setPage) {
+        // const filtered=requests
+        // .filter((request) => request.status  === statusFilter)
+        // .filter((request ) =>
+        //     request.employee_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        //     request.description.toLowerCase().includes(searchTerm.toLowerCase())
+        // );
         return (
+            <>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
@@ -95,7 +123,7 @@ function Checker () {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filtered.map((request) => (
+                        {requestList.map((request) => (
                             <TableRow key={request.request_id} >
                                 <TableCell>{request.employee_name}</TableCell>
                                 <TableCell>{request.days}</TableCell>
@@ -124,9 +152,16 @@ function Checker () {
                     </TableBody>
                 </Table>
             </TableContainer>
+            <Pagination
+                count={totalPages}
+                page={currentPage}
+                onChange={(event, value) => setPage(value)}
+                sx={{ marginTop: 2}}
+            >
+            </Pagination>
+            </>
         );
        
-              
      }
      return (
         <Box sx={{ padding : 3 }}>
@@ -171,9 +206,9 @@ function Checker () {
                 <Tab label="Rejected"></Tab>        
             </Tabs> 
             <Box sx={{ marginTop: 2 }}>
-        {activeTab === 0 && renderColumn("Pending")}
-        {activeTab === 1 && renderColumn("Approved")}
-        {activeTab === 2 && renderColumn("Rejected")}
+        {activeTab === 0 && renderColumn(pendingRequests, pendingPage, pendingTotalPages, setPendingPage)}
+        {activeTab === 1 && renderColumn(approvedRequests, approvedPage, approvedTotalPages, setApprovedPage)}
+        {activeTab === 2 && renderColumn(rejectedRequests, rejectedPage, rejectedTotalPages, setRejectedPage)}
             </Box>     
        
        </Box>
