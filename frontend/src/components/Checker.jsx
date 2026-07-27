@@ -39,14 +39,16 @@ function Checker () {
         loadRequestsByStatus("Rejected", rejectedPage, setRejectedRequests, setRejectedTotalPages);
     }, [rejectedPage, searchTerm]);
 
-     function loadRequestsByStatus (status, page, setDataFn, setTotalPagesFn) {
-        fetch( `http://localhost:5000/requests/${project.project_id}?page=${page}&limit=5&search=${searchTerm}&status=${status}`)
-        .then((res)  => res.json())
-        .then ((response) => {
-            setDataFn(response.data);
-            setTotalPagesFn(response.totalPages);
-        } )
-        .catch((err) => console.error(err));
+     async function loadRequestsByStatus (status, page, setDataFn, setTotalPagesFn) {
+      try {
+        const res= await fetch( `http://localhost:5000/requests/${project.project_id}?page=${page}&limit=5&search=${searchTerm}&status=${status}`)
+       const response= await res.json();
+        setDataFn(response.data);
+        setTotalPagesFn(response.totalPages);
+        }
+        catch(err) { 
+            console.error(err);
+        }
      }
      function handleTabChange (event, newVal) {
         setActiveTab(newVal);
@@ -78,31 +80,29 @@ function Checker () {
         }
     }
 
-     function updateStatus (request_id, newStatus) {
-        fetch( `http://localhost:5000/requests/${request_id}`, {
-            method: "PATCH",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({status: newStatus}),
-
+    async function updateStatus(request_id, newStatus) {
+        try {
+        const res= await fetch(`http://localhost:5000/requests/${request_id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
         })
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.success) {
-                    loadRequestsByStatus("Pending", pendingPage, setPendingRequests, setPendingTotalPages);
-
-                    if (newStatus==="Approved"){
-                        loadRequestsByStatus("Approved", approvedPage, setApprovedRequests, setApprovedTotalPages);
-                    }
-                    else if (newStatus=="Rejected") {
-                        loadRequestsByStatus("Rejected", rejectedPage, setRejectedRequests, setRejectedTotalPages);
-                    }
-                } else {
-                    alert("Something went wrong while updating the request");
+      const response=await res.json();
+            if (response.success) {
+                loadRequestsByStatus("Pending", pendingPage, setPendingRequests, setPendingTotalPages);
+                if (newStatus === "Approved") {
+                    loadRequestsByStatus("Approved", approvedPage, setApprovedRequests, setApprovedTotalPages);
+                } else if (newStatus === "Rejected") {
+                    loadRequestsByStatus("Rejected", rejectedPage, setRejectedRequests, setRejectedTotalPages);
                 }
-            })
-            .catch((err) => console.error(err));
-     }
-
+            } else {
+                alert("Something went wrong while updating the request");
+            }
+        }
+        catch(err) { 
+            console.error(err);
+        }
+}
      function renderColumn(requestList, currentPage, totalPages, setPage) {
         // const filtered=requests
         // .filter((request) => request.status  === statusFilter)
