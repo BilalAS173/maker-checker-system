@@ -61,6 +61,8 @@ db.query(countQuery, [projectId, statusPattern,searchPattern, searchPattern], (e
   });
 });
 
+const jwt=require("jsonwebtoken");
+
 //for login
 app.post("/login", (req, res)=> {
     const{ employee_id, password}=req?.body;
@@ -91,6 +93,13 @@ app.post("/login", (req, res)=> {
             console.error(err);
             return res.status(500).json({ error: "Database Error"});
         }
+        
+        const token= jwt.sign(
+            {user_id: user.user_id, employee_id: user.employee_id, name: user.name},
+            process.env.JWT_SECRET,
+            {expiresIn: "30m"}
+        );
+
    res.json({
     user_id: user.user_id,
     employee_id: user.employee_id,
@@ -100,6 +109,22 @@ app.post("/login", (req, res)=> {
         });
     });
 });
+
+function verifyToken(req, res, next) {
+    const authHeader=req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).json({ error: "No token provided"});
+    }
+    const token=authHeader.split(" ")[1];
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(403).json({error: "Invalid or expired token"});
+        }
+        req.user=decoded;
+        next();
+    });
+}
 
 //Post a request for Maker
 app.post ("/requests", (req, res) => {
