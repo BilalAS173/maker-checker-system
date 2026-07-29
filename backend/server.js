@@ -8,8 +8,10 @@ const PORT = process.env.PORT || 5000 ;
 app.use(cors());
 app.use(express.json());
 
+const jwt=require("jsonwebtoken");
+
 //get all requests for a project
-app.get("/requests/:projectId", (req, res) => {
+app.get("/requests/:projectId", verifyToken, (req, res) => {
     const { projectId }=req.params;
     const { page=1, limit=10, search= "", status=""}=req.query;
     const offset= (page-1)*limit;
@@ -61,8 +63,6 @@ db.query(countQuery, [projectId, statusPattern,searchPattern, searchPattern], (e
   });
 });
 
-const jwt=require("jsonwebtoken");
-
 //for login
 app.post("/login", (req, res)=> {
     const{ employee_id, password}=req?.body;
@@ -101,6 +101,7 @@ app.post("/login", (req, res)=> {
         );
 
    res.json({
+    token,
     user_id: user.user_id,
     employee_id: user.employee_id,
     name: user.name,
@@ -127,7 +128,7 @@ function verifyToken(req, res, next) {
 }
 
 //Post a request for Maker
-app.post ("/requests", (req, res) => {
+app.post ("/requests", verifyToken, (req, res) => {
 const {user_id, project_id, days, description}=req.body;
 const query= "INSERT INTO requests (user_id, project_id, days, description) VALUES (?,?,?,?)";
 db.query(query, [user_id, project_id, days, description], (err, result) => {
@@ -141,7 +142,7 @@ res.json({success: true, request_id: result.insertId});
 
 
 //Patch a request's status (used by Checker's Approve/Reject buttons)
-app.patch("/requests/:requestId", (req, res) => {
+app.patch("/requests/:requestId", verifyToken, (req, res) => {
     const {requestId} = req.params;
     const {status }=req.body;
     const query="UPDATE requests SET status = ? WHERE request_id= ?";
