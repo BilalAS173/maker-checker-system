@@ -9,6 +9,7 @@ app.use(cors());
 app.use(express.json());
 
 const jwt=require("jsonwebtoken");
+const bcrypt=require("bcrypt");
 
 //get all requests for a project
 app.get("/requests/:projectId", verifyToken, (req, res) => {
@@ -64,12 +65,12 @@ db.query(countQuery, [projectId, statusPattern,searchPattern, searchPattern], (e
 });
 
 //for login
-app.post("/login", (req, res)=> {
+app.post("/login", async (req, res)=> {
     const{ employee_id, password}=req?.body;
     console.log("user details ", employee_id, password)
 
-    const userQuery= "SELECT * FROM users WHERE employee_id = ? AND password = ?";
-    db.query(userQuery, [employee_id, password], (err, userResults) =>
+    const userQuery= "SELECT * FROM users WHERE employee_id = ?";
+    db.query(userQuery, [employee_id], async (err, userResults) =>
     {
         console.log("userResults", userResults)
         if (err) {
@@ -81,6 +82,12 @@ app.post("/login", (req, res)=> {
         }
         
         const user = userResults[0];
+        const passwordMatches= await bcrypt.compare(password, user.password)
+
+        if (!passwordMatches) {
+            return res.status(401).json({error: "Invalid Employee ID or password"});
+        }
+
         const projectsQuery= `
         SELECT p.project_id, p.project_name, up.role
         FROM user_projects up
