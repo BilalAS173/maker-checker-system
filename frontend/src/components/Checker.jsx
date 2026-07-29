@@ -8,6 +8,7 @@ import SearchIcon from "@mui/icons-material/Search";
 
 function Checker () {
     const project= useSelector((state) => state.project);
+    const user = useSelector((state) => state.user);
 
     const [searchTerm, setSearchTerm] = useState("");
     const [activeTab, setActiveTab] = useState(0);
@@ -41,7 +42,13 @@ function Checker () {
 
      async function loadRequestsByStatus (status, page, setDataFn, setTotalPagesFn) {
       try {
-        const res= await fetch( `http://localhost:5000/requests/${project.project_id}?page=${page}&limit=5&search=${searchTerm}&status=${status}`)
+        const res= await fetch( `http://localhost:5000/requests/${project.project_id}?page=${page}&limit=5&search=${searchTerm}&status=${status}`, 
+        {
+            headers : {
+                "Authorization":   `Bearer ${user.token}`
+            },
+        }
+     );
        const response= await res.json();
         setDataFn(response.data);
         setTotalPagesFn(response.totalPages);
@@ -84,7 +91,9 @@ function Checker () {
         try {
         const res= await fetch(`http://localhost:5000/requests/${request_id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json",
+                    "Authorization" : `Bearer ${user.token}`
+         },
         body: JSON.stringify({ status: newStatus }),
         })
       const response=await res.json();
@@ -104,12 +113,6 @@ function Checker () {
         }
 }
      function renderColumn(requestList, currentPage, totalPages, setPage) {
-        // const filtered=requests
-        // .filter((request) => request.status  === statusFilter)
-        // .filter((request ) =>
-        //     request.employee_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        //     request.description.toLowerCase().includes(searchTerm.toLowerCase())
-        // );
         return (
             <>
             <TableContainer component={Paper}>

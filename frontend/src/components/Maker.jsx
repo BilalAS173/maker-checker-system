@@ -24,50 +24,54 @@ useEffect( () => {
 }, []
 );
 
-function loadMyRequests () {
-    fetch( `http://localhost:5000/requests/${project.project_id}`)
-    .then((res)=> (res.json()))
-    .then((response) => {
-        const mine= (response.data).filter((r) => r.employee_name === user.name);
-        setRequests(mine); 
-    })
-    .catch((err) => console.error(err));
+async function loadMyRequests() {
+ try {
+    const res= await fetch(`http://localhost:5000/requests/${project.project_id}`,
+  { 
+     headers:  {
+        "Authorization" : `Bearer ${user.token}`
+     },
+    }
+ );
+    const response= await res.json();
+    const mine = response.data.filter((r) => r.employee_name === user.name);
+        setRequests(mine);
+    }
+        catch(err) {
+            console.error(err)
+        };
 }
 
-function handleSubmit (e) {
+async function handleSubmit(e) {
+  try { 
     e.preventDefault();
-
-    fetch("http://localhost:5000/requests", {
+   const res= await fetch("http://localhost:5000/requests", {
         method: "POST",
-        headers: {"Content-Type" : "application/json" },
-        body: JSON.stringify( {
-            user_id:user.user_id,
-            project_id:project.project_id,
+        headers: { "Content-Type": "application/json" ,
+            "Authorization" : `Bearer ${user.token}`
+         },
+        body: JSON.stringify({
+            project_id: project.project_id,
             days,
-            description: reason
-        } )
-
+            description: reason,
+        }),
     })
-    .then((res) => res.json())
-    .then((data) => {
-        if (data.success) {
-            setDays(" ");
-            setReason(" ");
-            loadMyRequests( );
-            setView("list");
-            alert("Request submited");
-        }
-            else {
+        const response= await res.json()
+           if (response.success) {
+                setDays(" ");
+                setReason(" ");
+                loadMyRequests();
+                setView("list");
+                alert("Request submitted");
+            } else {
                 alert("Something went wrong when submitting the request");
             }
-
             
-        } )
-        .catch((err)  => {
+        } catch(err) {
             console.error(err);
             alert("Could not connect to server");
-        });
-    }
+        };
+}
 
     function isValidSearchTerm (value) {
         const allowedPattern= /^[a-zA-Z0-9 ][a-zA-Z0-9 ']*[a-zA-Z0-9 ]$|^[a-zA-Z0-9 ]?$/;

@@ -136,8 +136,9 @@ function verifyToken(req, res, next) {
 
 //Post a request for Maker
 app.post ("/requests", verifyToken, (req, res) => {
-const {user_id, project_id, days, description}=req.body;
-const query= "INSERT INTO requests (user_id, project_id, days, description) VALUES (?,?,?,?)";
+const {project_id, days, description}=req.body;
+const user_id= req.user.user_id;
+const query= "INSERT INTO requests ( user_id, project_id, days, description) VALUES (?,?,?,?)";
 db.query(query, [user_id, project_id, days, description], (err, result) => {
 if(err) {
     console.error(err);
