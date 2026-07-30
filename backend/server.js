@@ -134,8 +134,37 @@ function verifyToken(req, res, next) {
     });
 }
 
+function requireCheckerRole (req, res, next) {
+    const {requestId} = req.params; //see inside req.params obj, see the property user_id and store it's value inside the variable named same as the property
+    const {user_id} = req.user; //see inside req.user obj, see the property user_id and store it's value inside the variable named same as the property
+
+    const query= ` 
+        SELECT EXISTS (
+        SELECT 1
+        FROM requests r
+        JOIN user_projects up ON r.project_id=up.project_id
+        WHERE r.request_id= ?
+        AND up.user_id= ?
+        AND up.role='checker'
+        ) AS authorized
+    `;
+
+    db.query(query, [requestId, user_id], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error:"Database error"});
+        }
+        const isAuthorized=results[0].authorized===1;
+        if (!isAuthorized) {
+            return res.status(403).json({error: "You are not authorized to perform this action."});
+        }
+        next();
+    })
+
+}
+
 //Post a request for Maker
-app.post ("/requests", verifyToken, (req, res) => {
+app.post ("/requests", verifyToken, requireMakerRole, (req, res) => {
 const {project_id, days, description}=req.body;
 const user_id= req.user.user_id;
 const query= "INSERT INTO requests ( user_id, project_id, days, description) VALUES (?,?,?,?)";
@@ -148,9 +177,35 @@ res.json({success: true, request_id: result.insertId});
 });
 });
 
+function requireMakerRole(req, res, next) {
+    const {project_id} = req.body;
+    const {user_id} = req.user;
+
+    const query= `
+        SELECT EXISTS (
+        SELECT 1 
+        FROM user_projects up
+        WHERE up.project_id=?
+        AND up.user_id=?
+        AND up.role='maker'
+        ) AS authorized
+    `;
+
+    db.query( query, [project_id, user_id], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({error: "Database error"});
+        }
+        const isAuthorized= results[0].authorized===1;
+        if (!isAuthorized) {
+            return res.status(403).json({error: "You are not allowed to submit a request for this project"})
+        }
+        next();
+    });
+}
 
 //Patch a request's status (used by Checker's Approve/Reject buttons)
-app.patch("/requests/:requestId", verifyToken, (req, res) => {
+app.patch("/requests/:requestId", verifyToken, requireCheckerRole, (req, res) => {
     const {requestId} = req.params;
     const {status }=req.body;
     const query="UPDATE requests SET status = ? WHERE request_id= ?";
@@ -162,7 +217,6 @@ app.patch("/requests/:requestId", verifyToken, (req, res) => {
         res.json({success: true});
     });
 });
-
 
 
 app.listen(PORT, () => {
