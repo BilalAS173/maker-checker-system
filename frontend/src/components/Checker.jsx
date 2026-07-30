@@ -1,20 +1,23 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import { Tabs, Tab, Box, Button, Paper, AppBar, Toolbar, Typography, TextField, InputAdornment, IconButton } from "@mui/material";
 import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Pagination
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import { useNavigate } from "react-router-dom";
+import { logout } from "../store/userSlice";
+import { clearProject } from "../store/projectSlice";
 
 function Checker () {
     const project= useSelector((state) => state.project);
     const user = useSelector((state) => state.user);
+    const dispatch  = useDispatch();
+    const navigate = useNavigate();
 
     const [searchTerm, setSearchTerm] = useState("");
     const [activeTab, setActiveTab] = useState(0);
     const [searchInput, setSearchInput]= useState("");
-    //const [currentPage, setCurrentPage] = useState(1);
-    //const [totalPages, setTotalPages] = useState(1);
 
     const[ pendingRequests, setPendingRequests]= useState([]);
     const [pendingPage, setPendingPage]= useState(1);
@@ -40,6 +43,17 @@ function Checker () {
         loadRequestsByStatus("Rejected", rejectedPage, setRejectedRequests, setRejectedTotalPages);
     }, [rejectedPage, searchTerm]);
 
+    function handleAuthError(res) {
+        if (res.status===403|| res.status===401) {
+            dispatch(logout());
+            dispatch(clearProject());
+            navigate("/login");
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
      async function loadRequestsByStatus (status, page, setDataFn, setTotalPagesFn) {
       try {
         const res= await fetch( `http://localhost:5000/requests/${project.project_id}?page=${page}&limit=5&search=${searchTerm}&status=${status}`, 
@@ -49,6 +63,9 @@ function Checker () {
             },
         }
      );
+        if (handleAuthError(res)) {
+            return;
+        }
        const response= await res.json();
         setDataFn(response.data);
         setTotalPagesFn(response.totalPages);
@@ -95,7 +112,12 @@ function Checker () {
                     "Authorization" : `Bearer ${user.token}`
          },
         body: JSON.stringify({ status: newStatus }),
-        })
+        });
+        
+        if (handleAuthError(res)) {
+            return;
+        }
+
       const response=await res.json();
             if (response.success) {
                 loadRequestsByStatus("Pending", pendingPage, setPendingRequests, setPendingTotalPages);

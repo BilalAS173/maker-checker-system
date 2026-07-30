@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import {
     Box, Typography, TextField, Button, InputAdornment, IconButton,
@@ -6,11 +6,16 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew"
+import { logout } from "../store/userSlice";
+import { clearProject } from "../store/projectSlice";
+import { useNavigate } from "react-router-dom";
 
-function Maker ( ) {
-    
+function Maker () {
+
 const user= useSelector((state) => state.user);
 const project= useSelector((state) => state.project);
+const dispatch = useDispatch();
+const navigate = useNavigate();
 
 const [days, setDays]=useState("");
 const [reason, setReason]=useState("");
@@ -24,6 +29,18 @@ useEffect( () => {
 }, []
 );
 
+function handleAuthError(res) {
+    if (res.status===401 || res.status===403) {
+        dispatch(logout());
+        dispatch(clearProject());
+        navigate("/login");
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 async function loadMyRequests() {
  try {
     const res= await fetch(`http://localhost:5000/requests/${project.project_id}`,
@@ -33,6 +50,9 @@ async function loadMyRequests() {
      },
     }
  );
+ if (handleAuthError(res)) {
+    return;
+ }
     const response= await res.json();
     const mine = response.data.filter((r) => r.employee_name === user.name);
         setRequests(mine);
@@ -55,7 +75,10 @@ async function handleSubmit(e) {
             days,
             description: reason,
         }),
-    })
+    });
+        if (handleAuthError(res)) {
+            return;
+        }
         const response= await res.json()
            if (response.success) {
                 setDays(" ");
@@ -110,16 +133,8 @@ return (
                     }
                 }}
                 
-              /*  InputProps={{
-                    startAdornment: (
-                        <InputAdornment position="start">
-                            <SearchIcon />
-                        </InputAdornment>
-                    ),
-                }}
-                sx={{ width: 300 , color: "white"}}*/
-
             />
+
             <IconButton onClick={handleSearchSubmit}>
             <SearchIcon />
              </IconButton>
