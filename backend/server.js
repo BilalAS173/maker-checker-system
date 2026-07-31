@@ -4,12 +4,33 @@ const cors= require("cors");
 const db= require("./db");
 const app = express();
 const PORT = process.env.PORT || 5000 ;
+const rateLimit= require("express-rate-limit");
+const slowDown=require("express-slow-down");
 
 app.use(cors());
 app.use(express.json());
 
 const jwt=require("jsonwebtoken");
 const bcrypt=require("bcrypt");
+
+const speedLimiter = slowDown({
+    windowMs: 1000*15*60,
+    delayAfter: 3,
+    delayMs: () => 1000
+})
+
+const limiter= rateLimit({
+    windowMs: 1000*15*60,
+    max: 6,
+    message : {
+        error: "Too many requests. Try again in 15 minutes."
+    },
+    skipSuccessfulRequests: true
+});
+
+app.use(speedLimiter);
+app.use(limiter);
+
 
 //get all requests for a project
 app.get("/requests/:projectId", verifyToken, (req, res) => {
