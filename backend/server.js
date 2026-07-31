@@ -16,7 +16,8 @@ const bcrypt=require("bcrypt");
 const speedLimiter = slowDown({
     windowMs: 1000*15*60,
     delayAfter: 3,
-    delayMs: () => 1000
+    delayMs: () => 1000,
+    keyGenerator: (req) => `${req.ip}-${req.body.employee_id}`,
 })
 
 const limiter= rateLimit({
@@ -25,11 +26,12 @@ const limiter= rateLimit({
     message : {
         error: "Too many requests. Try again in 15 minutes."
     },
-    skipSuccessfulRequests: true
+    skipSuccessfulRequests: true,
+    keyGenerator: (req) => `${req.ip}-${req.body.employee_id}`,
 });
 
-app.use(speedLimiter);
-app.use(limiter);
+//app.use(speedLimiter);
+//app.use(limiter);
 
 
 //get all requests for a project
@@ -86,7 +88,7 @@ db.query(countQuery, [projectId, statusPattern,searchPattern, searchPattern], (e
 });
 
 //for login
-app.post("/login", async (req, res)=> {
+app.post("/login", speedLimiter, limiter, async (req, res)=> {
     const{ employee_id, password}=req?.body;
     console.log("user details ", employee_id, password)
 
