@@ -54,7 +54,7 @@ body: JSON.stringify({employee_id: employeeId, password}),
     })
       const response = (await res.json()) as LoginResult;
         console.log( " request result : ", response)
-        if (response.error) {
+        if ("error" in response) {
           setError(response.error);
         } else {
           setError("");
