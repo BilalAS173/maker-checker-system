@@ -10,38 +10,61 @@ import {
   InputLabel,
 } from "@mui/material";
 
-function Login({ onLogin }) {
+interface Project {
+  projectID: number;
+  projectName: string;
+  role: string
+}
+
+interface LoginResponse {
+  token: string;
+  userID: number;
+  employeeId: number;
+  name: string;
+  project: Project [];
+}
+
+interface LoginError {
+  error: string;
+}
+
+type LoginResult= | LoginResponse | LoginError ;
+
+interface LoginProps {
+  onLogin: (data: LoginResponse) => void;
+}
+
+function Login({ onLogin }: LoginProps) {
   const [employeeId, setEmployeeId] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   async function handleClick() {
-
     const request= {
         employeeId: employeeId, 
         password: password 
     }
     
     console.log(request)
-    await fetch("http://localhost:5000/login", {
+   try{ 
+    const res= await fetch("http://localhost:5000/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
 body: JSON.stringify({employee_id: employeeId, password}),
     })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log( " request result : ", data)
-        if (data.error) {
-          setError(data.error);
+      const response = (await res.json()) as LoginResult;
+        console.log( " request result : ", response)
+        if (response.error) {
+          setError(response.error);
         } else {
           setError("");
-          onLogin(data);
+          onLogin(response);
         }
-      })
-      .catch((err) => {
+      }
+      catch(err) { 
         console.error(err);
         setError("Could not connect to server");
-      });
+     }
   }
 
   return (
