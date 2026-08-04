@@ -1,25 +1,32 @@
-import { useState } from "react";
+import React from "react";
 import {useSelector} from 'react-redux';
 import {
   Box,
   Typography,
-  TextField,
-  Button,
-  InputAdornment,
+  // TextField,
+  // Button,
+  // InputAdornment,
   IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
+  // Table,
+  // TableBody,
+  // TableCell,
+  // TableContainer,
+  // TableHead,
+  // TableRow,
+  // Paper,
 } from "@mui/material";
-import { purple } from "@mui/material/colors";
+//import { purple } from "@mui/material/colors";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
+import { LoginResponse } from "./Login";
 
-function Layout({ children, onLogout, title }) {
-  const user=useSelector((state) => state.user);
+export interface LayoutProps {
+  children: React.ReactNode;
+  onLogout : () =>void;
+  title: string;
+}
+
+function Layout({children, onLogout, title}: LayoutProps) {
+  const user=useSelector((state: {user: LoginResponse}) => state.user);
   return (
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
       {/* //it should contain side bar and a box containing nav bar and content*/}
