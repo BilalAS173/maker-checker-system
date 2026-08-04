@@ -10,18 +10,18 @@ import {
   InputLabel,
 } from "@mui/material";
 
-interface Project {
-  projectID: number;
-  projectName: string;
+export interface Project {
+  project_id: number;
+  project_name: string;
   role: string
 }
 
-interface LoginResponse {
+export interface LoginResponse {
   token: string;
-  userID: number;
-  employeeId: number;
+  user_id: number;
+  employee_id: number;
   name: string;
-  project: Project [];
+  projects: Project [];
 }
 
 interface LoginError {

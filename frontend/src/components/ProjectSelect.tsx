@@ -1,7 +1,13 @@
 import { useSelector } from "react-redux";
-import {Box, Typography, Button, textFieldClasses} from "@mui/material"
-function ProjectSelect({onSelectProject}) {
-    const user= useSelector((state) => state.user);
+import {Box, Typography, Button} from "@mui/material"
+import {Project, LoginResponse} from "./Login"
+
+export interface ProjectSelectProps {
+onSelectProject: (data: Project) => void;
+}
+
+function ProjectSelect({onSelectProject}: ProjectSelectProps) {
+    const user= useSelector((state : {user: LoginResponse}) => state.user);
     return (
         <Box  
          sx={{
