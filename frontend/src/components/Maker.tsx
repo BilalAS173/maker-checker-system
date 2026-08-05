@@ -5,15 +5,28 @@ import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Chip
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew"
+//import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew"
 import { logout } from "../store/userSlice";
 import { clearProject } from "../store/projectSlice";
 import { useNavigate } from "react-router-dom";
+import { LoginResponse, Project } from "./Login";
+
+export interface RequestData {
+    request_id: number;
+    employee_name: string;
+    days: number;
+    description: string;
+    status: number;
+}
+
+export interface RequestsResponse {
+    data: RequestData [];
+}
 
 function Maker () {
 
-const user= useSelector((state) => state.user);
-const project= useSelector((state) => state.project);
+const user= useSelector((state : {user: LoginResponse}) => state.user);
+const project= useSelector((state: {project: Project}) => state.project);
 const dispatch = useDispatch();
 const navigate = useNavigate();
 
@@ -21,7 +34,7 @@ const [days, setDays]=useState("");
 const [reason, setReason]=useState("");
 const [view, setView]=useState("list")
 const [searchTerm, setsearchTerm]=useState("")
-const [requests, setRequests]=useState([])
+const [requests, setRequests]=useState<RequestData[]>([])
 const [searchInput, setsearchInput]= useState("");
 
 useEffect( () => {
@@ -29,7 +42,7 @@ useEffect( () => {
 }, []
 );
 
-function handleAuthError(res) {
+function handleAuthError(res : Response ): boolean {
     if (res.status===401 || res.status===403) {
         dispatch(logout());
         dispatch(clearProject());
@@ -53,7 +66,7 @@ async function loadMyRequests() {
  if (handleAuthError(res)) {
     return;
  }
-    const response= await res.json();
+    const response : RequestsResponse = await res.json();
     const mine = response.data.filter((r) => r.employee_name === user.name);
         setRequests(mine);
     }
@@ -65,7 +78,7 @@ async function loadMyRequests() {
 async function handleSubmit(e) {
   try { 
     e.preventDefault();
-   const res= await fetch("http://localhost:5000/requests", {
+   const res :Response = await fetch("http://localhost:5000/requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" ,
             "Authorization" : `Bearer ${user.token}`
@@ -96,7 +109,7 @@ async function handleSubmit(e) {
         };
 }
 
-    function isValidSearchTerm (value) {
+    function isValidSearchTerm (value : string) {
         const allowedPattern= /^[a-zA-Z0-9 ][a-zA-Z0-9 ']*[a-zA-Z0-9 ]$|^[a-zA-Z0-9 ]?$/;
         return allowedPattern.test(value);
     }
