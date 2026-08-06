@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
-import { Tabs, Tab, Box, Button, Paper, AppBar, Toolbar, Typography, TextField, InputAdornment, IconButton } from "@mui/material";
+import { Tabs, Tab, Box, Button, Paper, AppBar, Toolbar, Typography, TextField, IconButton } from "@mui/material";
 import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Pagination
 } from "@mui/material";
@@ -8,10 +8,12 @@ import SearchIcon from "@mui/icons-material/Search";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../store/userSlice";
 import { clearProject } from "../store/projectSlice";
+import {RequestData, RequestsResponse} from "./Maker"
+import {LoginResponse, Project} from "./Login"
 
 function Checker () {
-    const project= useSelector((state) => state.project);
-    const user = useSelector((state) => state.user);
+    const project= useSelector((state : {project: Project | null}) => state.project);
+    const user = useSelector((state: {user: LoginResponse | null}) => state.user);
     const dispatch  = useDispatch();
     const navigate = useNavigate();
 
@@ -19,15 +21,15 @@ function Checker () {
     const [activeTab, setActiveTab] = useState(0);
     const [searchInput, setSearchInput]= useState("");
 
-    const[ pendingRequests, setPendingRequests]= useState([]);
+    const[ pendingRequests, setPendingRequests]= useState<RequestData[]>([]);
     const [pendingPage, setPendingPage]= useState(1);
     const [pendingTotalPages, setPendingTotalPages]= useState(1);
 
-    const [approvedRequests, setApprovedRequests]= useState([]);
+    const [approvedRequests, setApprovedRequests]= useState<RequestData[]>([]);
     const [approvedPage, setApprovedPage]= useState(1);
     const [approvedTotalPages, setApprovedTotalPages]= useState(1);
 
-    const [rejectedRequests, setRejectedRequests]= useState([]);
+    const [rejectedRequests, setRejectedRequests]= useState<RequestData[]>([]);
     const [rejectedPage, setRejectedPage]= useState(1);
     const [rejectedTotalPages, setRejectedTotalPages]= useState(1);
 
@@ -43,7 +45,7 @@ function Checker () {
         loadRequestsByStatus("Rejected", rejectedPage, setRejectedRequests, setRejectedTotalPages);
     }, [rejectedPage, searchTerm]);
 
-    function handleAuthError(res) {
+    function handleAuthError(res: Response): boolean {
         if (res.status===403|| res.status===401) {
             dispatch(logout());
             dispatch(clearProject());
@@ -54,8 +56,11 @@ function Checker () {
             return false;
         }
     }
-     async function loadRequestsByStatus (status, page, setDataFn, setTotalPagesFn) {
-      try {
+     async function loadRequestsByStatus (status: string, page: number, setDataFn: React.Dispatch<React.SetStateAction<RequestData[]>>, setTotalPagesFn : React.Dispatch<React.SetStateAction<number>>) {
+      if (!user || !project) {
+        return;
+      }
+        try {
         const res= await fetch( `http://localhost:5000/requests/${project.project_id}?page=${page}&limit=5&search=${searchTerm}&status=${status}`, 
         {
             headers : {
@@ -66,7 +71,7 @@ function Checker () {
         if (handleAuthError(res)) {
             return;
         }
-       const response= await res.json();
+       const response: RequestsResponse = await res.json();
         setDataFn(response.data);
         setTotalPagesFn(response.totalPages);
         }
@@ -74,23 +79,23 @@ function Checker () {
             console.error(err);
         }
      }
-     function handleTabChange (event, newVal) {
+     function handleTabChange (event : React.SyntheticEvent, newVal:number) {
         setActiveTab(newVal);
      }
      
-     function approveRequest (request_id, currentStatus) {
+     function approveRequest (request_id: number, currentStatus: string) {
         if (currentStatus==="Rejected") {
             return;
         }
         updateStatus(request_id, "Approved");
      }
-       function rejectRequest (request_id, currentStatus) {
+       function rejectRequest (request_id: number, currentStatus: string) {
         if (currentStatus==="Approved") {
             return;
         }
         updateStatus(request_id, "Rejected");
      }
-     function isValidSearchTerm (value) {
+     function isValidSearchTerm (value : string) {
         const allowedPattern= /^[a-zA-Z0-9 ][a-zA-Z0-9 ']*[a-zA-Z0-9 ]$|^[a-zA-Z0-9 ]?$/;
         return allowedPattern.test(value);
     }
@@ -104,7 +109,10 @@ function Checker () {
         }
     }
 
-    async function updateStatus(request_id, newStatus) {
+    async function updateStatus(request_id : number, newStatus : string) {
+    if (!user || !project) {
+        return;
+      }
         try {
         const res= await fetch(`http://localhost:5000/requests/${request_id}`, {
         method: "PATCH",
@@ -134,7 +142,7 @@ function Checker () {
             console.error(err);
         }
 }
-     function renderColumn(requestList, currentPage, totalPages, setPage) {
+     function renderColumn(requestList: RequestData[], currentPage: number, totalPages: number, setPage: React.Dispatch<React.SetStateAction<number>>) {
         return (
             <>
             <TableContainer component={Paper}>
