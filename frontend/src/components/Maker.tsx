@@ -1,7 +1,7 @@
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector, useDispatch, ReactReduxContextValue } from "react-redux";
 import { useEffect, useState } from "react";
 import {
-    Box, Typography, TextField, Button, InputAdornment, IconButton,
+    Box, Typography, TextField, Button, IconButton,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Chip
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
@@ -16,7 +16,7 @@ export interface RequestData {
     employee_name: string;
     days: number;
     description: string;
-    status: number;
+    status: string;
 }
 
 export interface RequestsResponse {
@@ -75,7 +75,7 @@ async function loadMyRequests() {
         };
 }
 
-async function handleSubmit(e) {
+async function handleSubmit(e : React.FormEvent<HTMLFormElement>) {
   try { 
     e.preventDefault();
    const res :Response = await fetch("http://localhost:5000/requests", {
