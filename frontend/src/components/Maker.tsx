@@ -21,6 +21,9 @@ export interface RequestData {
 
 export interface RequestsResponse {
     data: RequestData [];
+    totalCount: number;
+    page: number;
+    totalPages: number;
 }
 
 function Maker () {
