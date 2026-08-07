@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
-import { Tabs, Tab, Box, Button, Paper, AppBar, Toolbar, Typography, TextField, IconButton } from "@mui/material";
+import { Tabs, Tab, Box, Button, Paper, Typography, TextField, IconButton } from "@mui/material";
 import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Pagination
 } from "@mui/material";
@@ -10,6 +10,16 @@ import { logout } from "../store/userSlice";
 import { clearProject } from "../store/projectSlice";
 import {RequestData, RequestsResponse} from "./Maker"
 import {LoginResponse, Project} from "./Login"
+
+type UpdateStatusResponse = UpdateStatusSuccess | UpdateStatusError
+
+export interface UpdateStatusSuccess {
+success: boolean;
+}
+
+export interface UpdateStatusError {
+    error: string;
+}
 
 function Checker () {
     const project= useSelector((state : {project: Project | null}) => state.project);
@@ -100,48 +110,48 @@ function Checker () {
         return allowedPattern.test(value);
     }
 
-    function handleSearchSubmit () {
-        if (isValidSearchTerm(searchInput)) {
-            setSearchTerm(searchInput);
-        }
-        else {
-            alert("Search term contains invalid characters.");
-        }
+    function handleSearchSubmit() {
+    if (isValidSearchTerm(searchInput)) {
+        setSearchTerm(searchInput);
+    } else {
+        alert("Search term contains invalid characters.");
     }
+}
 
-    async function updateStatus(request_id : number, newStatus : string) {
+ async function updateStatus(request_id: number, newStatus: string) {
     if (!user || !project) {
         return;
-      }
-        try {
-        const res= await fetch(`http://localhost:5000/requests/${request_id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json",
-                    "Authorization" : `Bearer ${user.token}`
-         },
-        body: JSON.stringify({ status: newStatus }),
+    }
+    try {
+        const res = await fetch(`http://localhost:5000/requests/${request_id}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${user.token}`
+            },
+            body: JSON.stringify({ status: newStatus }),
         });
-        
+
         if (handleAuthError(res)) {
             return;
         }
 
-      const response=await res.json();
-            if (response.success) {
-                loadRequestsByStatus("Pending", pendingPage, setPendingRequests, setPendingTotalPages);
-                if (newStatus === "Approved") {
-                    loadRequestsByStatus("Approved", approvedPage, setApprovedRequests, setApprovedTotalPages);
-                } else if (newStatus === "Rejected") {
-                    loadRequestsByStatus("Rejected", rejectedPage, setRejectedRequests, setRejectedTotalPages);
-                }
-            } else {
-                alert("Something went wrong while updating the request");
+        const response: UpdateStatusResponse = await res.json();
+        if ("success" in response && response.success) {
+            loadRequestsByStatus("Pending", pendingPage, setPendingRequests, setPendingTotalPages);
+            if (newStatus === "Approved") {
+                loadRequestsByStatus("Approved", approvedPage, setApprovedRequests, setApprovedTotalPages);
+            } else if (newStatus === "Rejected") {
+                loadRequestsByStatus("Rejected", rejectedPage, setRejectedRequests, setRejectedTotalPages);
             }
+        } else {
+            alert("Something went wrong while updating the request");
         }
-        catch(err) { 
-            console.error(err);
-        }
+    } catch (err) {
+        console.error(err);
+    }
 }
+
      function renderColumn(requestList: RequestData[], currentPage: number, totalPages: number, setPage: React.Dispatch<React.SetStateAction<number>>) {
         return (
             <>
