@@ -190,6 +190,29 @@ function requireCheckerRole (req, res, next) {
 app.post ("/requests", verifyToken, requireMakerRole, (req, res) => {
 const {project_id, days, description}=req.body;
 const user_id= req.user.user_id;
+
+// some validation checks
+if (!description) {
+    return res.status(400).json ({
+        error: "Description is required."
+    });
+}
+if (!description.trim()) {
+    return res.status(400).json ({
+        error: "Description cannot be empty."
+    })
+}
+if (description.length>400) {
+    return res.status(400).json ({
+        error: "Description cannot exceed 400 characters."
+    })
+}
+if (days>365) {
+    return res.status(400).json ({
+        error: "Number of days cannot be more than 365 (one year)."
+    })
+}
+
 const query= "INSERT INTO requests ( user_id, project_id, days, description) VALUES (?,?,?,?)";
 db.query(query, [user_id, project_id, days, description], (err, result) => {
 if(err) {

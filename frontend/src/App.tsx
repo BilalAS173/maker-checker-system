@@ -1,27 +1,27 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { login, logout } from './store/userSlice';
 import { selectProject, clearProject } from './store/projectSlice';
-import { Button } from "@mui/material";
 import Maker from "./components/Maker";
-import './App.css'
-import Login from './components/Login'
+import './App.css';
+import Login from './components/Login';
 import Checker from "./components/Checker";
 import ProjectSelect from './components/ProjectSelect';
-import Layout from './components/layout'
-import {Routes, Route, Navigate, useNavigate} from 'react-router-dom'
+import Layout from './components/layout';
+import {Routes, Route, Navigate, useNavigate} from 'react-router-dom';
+import {LoginResponse, Project} from './components/Login';
 
 function App() {
-  const user= useSelector((state) => state.user);
+  const user= useSelector((state : {user: LoginResponse | null}) => state.user);
   const dispatch= useDispatch();
 
-  const selectedProject=useSelector((state) => state.project);
+  const selectedProject=useSelector((state : {project: Project | null}) => state.project);
   const navigate= useNavigate();
 
-  function handleLogin(matchedUser) {
+  function handleLogin(matchedUser : LoginResponse) {
     dispatch(login(matchedUser));
     navigate("/projects");
   }
-  function handleProjectSelect(project) {
+  function handleProjectSelect(project : Project) {
     dispatch(selectProject(project));
     if (project.role === "maker" ) {
       navigate("/maker");
