@@ -1,11 +1,11 @@
 import React from "react";
 import {
-    Table, TableBody, TableCell, TableContainer, TableHead, TableRow
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip
 } from "@mui/material";
 
-interface Column <T> {
+export interface Column <T> {
     header: string;
-    render: (item: T) => React.ReactNode;
+    render: (item: T, index: number) => React.ReactNode;
 }
 
 interface TableDisplayProps <T> {
@@ -21,15 +21,15 @@ return (
         <TableHead>
             <TableRow>
                 {columns.map ((col) => 
-                   ( <TableCell key={col.header}></TableCell>)
+                  <TableCell key={col.header}> {col.header} </TableCell>
                     )}
             </TableRow>
         </TableHead>
         <TableBody>
-            {items.map ((item) => (
+            {items.map ((item, index) => (
                 <TableRow key={getRowKey(item)}>
                 {columns.map((col) => (
-                    <TableCell key={col.header}>{col.render(item)}</TableCell>
+                    <TableCell key={col.header}>{col.render(item, index)}</TableCell>
                 ))}
                 </TableRow>
             ))}
