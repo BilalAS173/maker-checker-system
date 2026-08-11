@@ -1,15 +1,16 @@
-import { useSelector, useDispatch, ReactReduxContextValue } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import {
-    Box, Typography, TextField, Button, IconButton,
-    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Chip
+    Box, Typography, TextField, Button, IconButton, Chip
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-//import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew"
 import { logout } from "../store/userSlice";
 import { clearProject } from "../store/projectSlice";
 import { useNavigate } from "react-router-dom";
 import { LoginResponse, Project } from "./Login";
+import TableDisplay from "./TableDisplay";
+import type {Column} from "./TableDisplay";
+
 
 export interface RequestData {
     request_id: number;
@@ -126,6 +127,42 @@ async function handleSubmit(e : React.FormEvent<HTMLFormElement>) {
         }
     }
 
+
+const columns: Column<RequestData>[] = [
+ {
+   header: "Request Number",
+   render: (_, index) => index + 1,
+ },
+ { 
+    header: "Name",
+    render: (item) => item.employee_name,
+
+ },
+ {
+    header: "Days",
+    render: (item) => item.days,
+ },
+ {
+    header: "Reason",
+    render: (item) => item.description,
+ }, 
+ {
+    header: "Status",
+    render: (item) =>(
+        <Chip 
+        label= {item.status}
+        color= {
+            item.status ==="Approved" ?
+            "success" : item.status==="Rejected" ?
+            "error" : "default"
+        }
+        >
+        </Chip>
+    ),
+ }
+
+]
+
 const filteredRequests= requests.filter((r) => r.description.toLowerCase().includes(searchTerm.toLowerCase()) 
 );
 return (
@@ -164,37 +201,12 @@ return (
         </Box>
 
         {view === "list" && (
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Request Number</TableCell>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Days</TableCell>
-                            <TableCell>Reason</TableCell>
-                            <TableCell>Status</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {filteredRequests.map((r, i) => (
-                            <TableRow key={r.request_id}>
-                                <TableCell>{i + 1}</TableCell>
-                                <TableCell>{r.employee_name}</TableCell>
-                                <TableCell>{r.days}</TableCell>
-                                <TableCell>{r.description}</TableCell>
-                                <TableCell>
-                                    <Chip label={r.status}
-                                        color={r.status === "Approved" ? "success" : r.status=="Rejected"
-                                            ? "error" : "default"
-                                        }
-                                    >
-                                    </Chip>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+           <TableDisplay
+           items={filteredRequests}
+           columns={columns}
+           getRowKey={(item) => item.request_id} 
+           />
+           
         )}
 
         {view === "form" && (
