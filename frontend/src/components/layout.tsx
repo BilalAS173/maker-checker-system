@@ -28,10 +28,11 @@ export interface LayoutProps {
 function Layout({children, onLogout, title}: LayoutProps) {
   const user=useSelector((state: {user: LoginResponse}) => state.user);
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh" }}>
+     <Box sx={{ display: "flex", minHeight: "100vh" }}>
       {/* //it should contain side bar and a box containing nav bar and content*/}
       <Box
         sx={{
+          display: {xs: "none", md: "block"},
           width: "20%",
           backgroundColor: "white",
           borderRight: "1px solid #e0e0e0",
@@ -42,7 +43,9 @@ function Layout({children, onLogout, title}: LayoutProps) {
         <Typography variant="h6">Employee Portal</Typography>
         {/* side bar content goes here*/}
       </Box>
-      <Box sx={{ width: "80%", display: "flex", flexDirection: "column" }}>
+     <Box sx={{ 
+        width: {xs: "100%", md: "80%"}, display: "flex", flexDirection: "column" 
+        }}>
         <Box
           sx={{
             width: "100%",
@@ -65,7 +68,12 @@ function Layout({children, onLogout, title}: LayoutProps) {
             alignItems:"center",
             gap: 1
           }}>
-            <Typography>{user.name}</Typography>
+           <Typography sx = {{
+              display : {
+                xs: "none",
+                sm: "block",
+            }
+            }}>{user.name}</Typography>
             <IconButton onClick={onLogout} sx={{color: "white"}} >
               <PowerSettingsNewIcon />
             </IconButton>
