@@ -7,16 +7,15 @@ export interface Column <T> {
     header: string;
     render: (item: T, index: number) => React.ReactNode;
 }
-
 interface TableDisplayProps <T> {
- items: T [];
- columns: Column <T>[];
+items: T [];
+columns: Column <T>[];
 getRowKey: (item: T) => string | number;
 }
 
 function TableDisplay <T> ({items, columns, getRowKey}: TableDisplayProps <T>) {
 return (
-    <TableContainer>
+    <TableContainer sx= {{overflowX: "auto"}}>
         <Table>
         <TableHead>
             <TableRow>
