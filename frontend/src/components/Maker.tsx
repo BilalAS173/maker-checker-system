@@ -166,7 +166,10 @@ const columns: Column<RequestData>[] = [
 const filteredRequests= requests.filter((r) => r.description.toLowerCase().includes(searchTerm.toLowerCase()) 
 );
 return (
-    <Box sx={{ display: "flex", flexDirection: "column" }}>
+    <Box sx={{ display: "flex", flexDirection: "column" ,
+        width: "100%",
+        overflow: "hidden",
+    }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, marginBottom: 2, color: "white"}}>
             <TextField
                 size="small"
