@@ -155,8 +155,8 @@ function Checker () {
      function renderColumn(requestList: RequestData[], currentPage: number, totalPages: number, setPage: React.Dispatch<React.SetStateAction<number>>) {
         return (
             <>
-            <TableContainer component={Paper}>
-                <Table>
+            <TableContainer component={Paper} sx={{overflowX: "auto"}}>
+                <Table sx={{minWidth: 600}}>
                     <TableHead>
                         <TableRow>
                             <TableCell>Name</TableCell>
@@ -208,8 +208,17 @@ function Checker () {
      }
      return (
         <Box sx={{ padding : 3 }}>
-            <Box sx={{display: "flex", alignItems:"center", justifyContent: "space-between", marginBottom: 2}}>
+            <Box sx={{
+                display: "flex", 
+                alignItems:{ xs: "stretch", sm:"center"}, 
+                justifyContent: "space-between",
+                flexDirection: {xs: "column", sm: "row"},
+                marginBottom: 2,
+                gap : 2,
+                }}>
             <Typography variant="h5" sx={{flexGrow: 1}}>Checker Dashboard</Typography>
+
+                <Box sx={{ display: "flex", alignItems: "center" }}>
                 <TextField
                     size="small"
                     placeholder="Search Requests..."
@@ -227,23 +236,16 @@ function Checker () {
                                 handleSearchSubmit();
                             }
                         }}
-                   /* InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchIcon />
-                            </InputAdornment>
-                        ),
-                    }}*/
                     sx={{ width: 250 }}
                 />
                 <IconButton onClick={handleSearchSubmit}>
                     <SearchIcon />
                 </IconButton>
-           
+             </Box>
             </Box>
        
           
-            <Tabs value={activeTab} onChange={handleTabChange} sx={{marginTop: 3}}>     
+            <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth" sx={{marginTop: 3}}>     
                 <Tab label="Pending"></Tab>  
                 <Tab label="Approved"></Tab>   
                 <Tab label="Rejected"></Tab>        
