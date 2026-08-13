@@ -1,6 +1,6 @@
 import React from "react";
 import {
-    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Paper
 } from "@mui/material";
 
 export interface Column <T> {
@@ -15,7 +15,7 @@ getRowKey: (item: T) => string | number;
 
 function TableDisplay <T> ({items, columns, getRowKey}: TableDisplayProps <T>) {
 return (
-    <TableContainer sx= {{overflowX: "auto"}}>
+    <TableContainer component={Paper} sx= {{overflowX: "auto"}}>
         <Table>
         <TableHead>
             <TableRow>

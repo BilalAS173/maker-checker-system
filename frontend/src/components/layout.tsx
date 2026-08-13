@@ -1,23 +1,15 @@
-import React from "react";
+import React, {useState} from "react";
 import {useSelector} from 'react-redux';
 import {
   Box,
   Typography,
-  // TextField,
-  // Button,
-  // InputAdornment,
   IconButton,
-  // Table,
-  // TableBody,
-  // TableCell,
-  // TableContainer,
-  // TableHead,
-  // TableRow,
-  // Paper,
+  Drawer,
 } from "@mui/material";
 //import { purple } from "@mui/material/colors";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
 import { LoginResponse } from "./Login";
+import MenuIcon from "@mui/icons-material/Menu";
 
 export interface LayoutProps {
   children: React.ReactNode;
@@ -27,6 +19,7 @@ export interface LayoutProps {
 
 function Layout({children, onLogout, title}: LayoutProps) {
   const user=useSelector((state: {user: LoginResponse}) => state.user);
+  const [drawerOpen, setDrawerOpen]=useState(false);
   return (
      <Box sx={{ display: "flex", minHeight: "100vh" }}>
       {/* //it should contain side bar and a box containing nav bar and content*/}
@@ -43,6 +36,19 @@ function Layout({children, onLogout, title}: LayoutProps) {
         <Typography variant="h6">Employee Portal</Typography>
         {/* side bar content goes here*/}
       </Box>
+      <Drawer
+      open={drawerOpen}
+      onClose= {() => setDrawerOpen(false)}    
+      >
+        <Box
+        sx= {{
+          width:250,
+          padding: 4,
+        }}
+        >
+        <Typography variant="h6">Employee Portal</Typography>
+        </Box>
+      </Drawer>
      <Box sx={{ 
         width: {xs: "100%", md: "80%"}, display: "flex", flexDirection: "column" 
         }}>
@@ -57,7 +63,23 @@ function Layout({children, onLogout, title}: LayoutProps) {
             alignItems: "center",
           }}
         >
-          <Box sx={{flex: 1}} />
+          <Box
+  sx={{
+    flex: 1,
+    display: "flex",
+    alignItems: "center",
+  }}
+>
+  <IconButton
+    onClick={() => setDrawerOpen(true)}
+    sx={{
+      color: "white",
+      display: { xs: "flex", md: "none" },
+    }}
+  >
+    <MenuIcon />
+  </IconButton>
+</Box>
           <Box sx={{flex: 1, textAlign: "center"}}>
             <Typography variant="h6">{title}</Typography>
           </Box>

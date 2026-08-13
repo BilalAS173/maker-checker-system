@@ -1,15 +1,14 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
-import { Tabs, Tab, Box, Button, Paper, Typography, TextField, IconButton } from "@mui/material";
-import {
-    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Pagination
-} from "@mui/material";
+import { Tabs, Tab, Box, Button, Typography, TextField, IconButton } from "@mui/material";
+import { Pagination } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../store/userSlice";
 import { clearProject } from "../store/projectSlice";
 import {RequestData, RequestsResponse} from "./Maker"
 import {LoginResponse, Project} from "./Login"
+import TableDisplay from "./TableDisplay";
 
 type UpdateStatusResponse = UpdateStatusSuccess | UpdateStatusError
 
@@ -155,46 +154,40 @@ function Checker () {
      function renderColumn(requestList: RequestData[], currentPage: number, totalPages: number, setPage: React.Dispatch<React.SetStateAction<number>>) {
         return (
             <>
-            <TableContainer component={Paper} sx={{overflowX: "auto"}}>
-                <Table sx={{minWidth: 600}}>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Days</TableCell>
-                            <TableCell>Reason</TableCell>
-                            <TableCell> Decision</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {requestList.map((request) => (
-                            <TableRow key={request.request_id} >
-                                <TableCell>{request.employee_name}</TableCell>
-                                <TableCell>{request.days}</TableCell>
-                                <TableCell>{request.description}</TableCell>
-                                <TableCell>
-                                    <Button variant="contained"
-                                    color={request.status=== "Approved" ? "success" : "inherit"}
-                                    onClick={()=> approveRequest(request.request_id, request.status)}
-                                    disabled={request.status === "Rejected"}
-                                    sx={{marginRight: 1}}
-                                    >
-                                    Approve
-                                    </Button>
-                                    <Button variant="contained"
-                                    color={request.status==="Rejected" ? "error" : "inherit"}
-                                    onClick={()=> rejectRequest(request.request_id, request.status)}
-                                    disabled={request.status==="Approved"}
-                                    sx={{marginLeft: 1}}
-                                    >
-                                    Reject
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                        )
-                    )}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+          <TableDisplay <RequestData> 
+          items={requestList}
+          getRowKey={(r) => r.request_id}
+          columns={[
+            {header: "name", render: (r) => r.employee_name},
+            {header: "days", render: (r)=> r.days },
+            {header: "reason", render: (r) => r.description},
+            {
+                header: "decision",
+                render: (r) =>
+                (
+                    <>
+                    <Button
+                    variant="contained"
+                    color={r.status === "Approved" ? "success" : "inherit"}
+                    onClick={() => approveRequest(r.request_id, r.status)}
+                    disabled={r.status === "Rejected"}
+                    sx={{marginRight: 1}}
+                    >
+                        Approve
+                    </Button>
+                    <Button
+                    variant="contained"
+                    color={r.status === "Rejected" ? "error" : "inherit"}
+                    onClick={() => rejectRequest(r.request_id, r.status)}
+                    disabled={r.status==="Approved"}
+                    sx= {{marginLeft: 1}}
+                    >
+                    Reject </Button>
+                    </>
+                ),
+            },
+          ]}
+          ></TableDisplay>
             <Pagination
                 count={totalPages}
                 page={currentPage}
