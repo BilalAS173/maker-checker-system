@@ -1,6 +1,6 @@
 import React from "react";
 import {
-    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Paper
+    Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 } from "@mui/material";
 
 export interface Column <T> {

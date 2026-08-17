@@ -2,12 +2,8 @@ import { useState } from "react";
 import {
   Box,
   Typography,
-  Select,
   TextField,
-  MenuItem,
   Button,
-  FormControl,
-  InputLabel,
 } from "@mui/material";
 
 export interface Project {

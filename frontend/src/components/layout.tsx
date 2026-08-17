@@ -6,7 +6,6 @@ import {
   IconButton,
   Drawer,
 } from "@mui/material";
-//import { purple } from "@mui/material/colors";
 import PowerSettingsNewIcon from "@mui/icons-material/PowerSettingsNew";
 import { LoginResponse } from "./Login";
 import MenuIcon from "@mui/icons-material/Menu";
